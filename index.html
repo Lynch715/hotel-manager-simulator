@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#171b1f">
+<link rel="icon" href="data:,">
+<title>雾都宾馆 · 总经理的两年</title>
+<style>
+:root{
+  --bg:#171b1f;--panel:#20262b;--panel2:#282f35;--panel3:#30383f;--line:#3b454d;
+  --text:#f0eee7;--muted:#a6adb1;--gold:#e2b95b;--green:#65bd8a;--red:#e4776b;
+  --blue:#71a9d2;--cyan:#67b8ba;--shadow:rgba(0,0,0,.28)
+}
+*{box-sizing:border-box;margin:0;padding:0;letter-spacing:0}
+html{background:var(--bg)}
+body{background:var(--bg);color:var(--text);font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif;font-size:15px;line-height:1.55;min-height:100vh}
+button,input{font:inherit}
+button{border:1px solid var(--line);background:var(--panel2);color:var(--text);border-radius:7px;padding:8px 12px;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+button:hover{border-color:var(--gold);color:var(--gold)}
+button:disabled{opacity:.35;cursor:not-allowed}
+button:disabled:hover{border-color:var(--line);color:var(--text)}
+button.primary{background:var(--gold);border-color:var(--gold);color:#1c1b17;font-weight:700}
+button.danger{border-color:#754b49;color:#efaaa4}
+button.icon{width:36px;height:36px;padding:0;display:inline-grid;place-items:center;font-size:18px}
+button.small{padding:6px 9px;font-size:13px}
+.app{max-width:980px;margin:0 auto;padding:10px 10px calc(72px + env(safe-area-inset-bottom))}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:4px 2px 7px}
+.brand{display:flex;align-items:center;gap:9px;min-width:0}
+.seal{width:37px;height:37px;border:1px solid var(--gold);display:grid;place-items:center;color:var(--gold);font-family:serif;font-weight:700;font-size:19px;background:#26261f;flex:0 0 auto}
+.brand h1{font-size:18px;color:var(--gold);white-space:nowrap}
+.brand p{font-size:11px;color:var(--muted);white-space:nowrap}
+.datebox{text-align:right;font-size:12px;color:var(--muted);white-space:nowrap}
+.datebox b{color:var(--text);font-size:14px}
+.top-actions{display:flex;align-items:center;gap:6px}
+.stats{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:5px;margin-bottom:7px}
+.stat{position:relative;text-align:center;background:var(--panel);border:1px solid var(--line);border-radius:7px;padding:6px 3px;min-width:0;cursor:help}
+.stat .label{font-size:11px;color:var(--muted)}
+.stat .value{font-size:16px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stat .value small{font-size:10px;font-weight:400;color:var(--muted)}
+.stat .delta{height:13px;font-size:10px}
+.stat .tip{display:none;position:absolute;z-index:30;top:103%;left:50%;transform:translateX(-50%);width:210px;background:#101417;border:1px solid var(--line);border-radius:7px;padding:8px;text-align:left;color:var(--muted);font-size:12px;box-shadow:0 8px 24px var(--shadow)}
+.stat:hover .tip,.stat.tip-on .tip{display:block}
+.up{color:var(--green)}.down{color:var(--red)}.gold{color:var(--gold)}.blue{color:var(--blue)}
+.forecast{background:var(--panel);border:1px solid var(--line);border-radius:7px;padding:7px 10px;margin-bottom:7px;display:flex;gap:12px;align-items:center;flex-wrap:wrap;font-size:12px;color:var(--muted)}
+.forecast b{color:var(--text)}
+.forecast .warning{color:var(--gold)}
+.pricing{background:var(--panel);border:1px solid var(--line);border-radius:7px;padding:8px 10px;margin-bottom:7px}
+.section-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px}
+.section-head h2{font-size:14px;color:var(--text)}
+.section-head span{font-size:11px;color:var(--muted)}
+.price-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+.price-row{display:grid;grid-template-columns:1fr auto;align-items:center;gap:6px;background:#191e22;border:1px solid #333c43;border-radius:6px;padding:6px 7px}
+.price-row .name{font-size:12px;color:var(--muted)}
+.price-row .price{font-size:15px;font-weight:700}
+.stepper{display:flex;gap:3px;align-items:center}
+.stepper button{width:30px;height:30px;padding:0;font-size:18px;display:grid;place-items:center}
+.energy{display:flex;align-items:center;gap:9px;background:var(--panel);border:1px solid var(--line);border-radius:7px;padding:7px 10px;margin-bottom:7px}
+.energy-dots{color:var(--gold);font-size:16px;white-space:nowrap}
+.energy .hint{font-size:12px;color:var(--muted);flex:1}
+.actions{display:grid;grid-template-columns:repeat(6,1fr);gap:5px;margin-bottom:7px}
+.action{background:var(--panel);border:1px solid var(--line);border-radius:7px;padding:8px 3px;text-align:center;cursor:pointer;user-select:none;min-width:0;touch-action:manipulation}
+.action:hover{border-color:var(--gold)}
+.action.off{opacity:.35;pointer-events:none}
+.action .glyph{font-size:20px;line-height:1.1}
+.action .name{font-size:13px;font-weight:700;margin-top:3px}
+.action .desc{font-size:10px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tabs{display:flex;gap:3px;margin-top:2px}
+.tabs button{flex:1;border-radius:7px 7px 0 0;border-bottom:0;padding:7px 2px;font-size:13px;min-width:0}
+.tabs button.on{background:var(--panel);border-color:var(--gold);color:var(--gold)}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:0 7px 7px 7px;padding:10px;min-height:330px}
+.subnav{display:flex;gap:5px;overflow-x:auto;padding-bottom:7px;margin-bottom:7px;border-bottom:1px solid var(--line);scrollbar-width:none}
+.subnav::-webkit-scrollbar{display:none}
+.subnav button{padding:5px 10px;font-size:12px;white-space:nowrap}
+.subnav button.on{color:var(--gold);border-color:var(--gold);background:#2d2d27}
+.card{background:var(--panel2);border:1px solid var(--line);border-radius:7px;padding:9px 10px;margin-bottom:7px}
+.card:last-child{margin-bottom:0}
+.row{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.card h3{font-size:14px;display:inline}
+.card .meta{font-size:11px;color:var(--muted)}
+.card .copy{font-size:12px;color:var(--muted);margin-top:4px}
+.card .number{font-size:13px;color:var(--muted);white-space:nowrap}
+.card .number b{color:var(--text)}
+.card-actions{display:flex;gap:5px;flex-wrap:wrap;margin-top:7px}
+.pill{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:1px 7px;font-size:10px;color:var(--muted);vertical-align:1px;margin-left:4px}
+.pill.gold{border-color:#725f32;color:var(--gold)}
+.pill.green{border-color:#365f49;color:#83d3a2}
+.pill.red{border-color:#70433f;color:#ee9a92}
+.pill.blue{border-color:#3b5870;color:#8bbce0}
+.progress{height:6px;background:#151a1d;border-radius:3px;overflow:hidden;margin-top:5px}
+.progress i{display:block;height:100%;background:var(--blue);border-radius:3px}
+.metric-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:8px}
+.metric{background:#191e22;border:1px solid #333c43;border-radius:6px;padding:7px;text-align:center}
+.metric .v{font-size:15px;font-weight:700;color:var(--gold)}
+.metric .k{font-size:10px;color:var(--muted)}
+.room-table,.rank-table{width:100%;border-collapse:collapse;font-size:12px}
+.room-table th,.room-table td,.rank-table th,.rank-table td{padding:6px 5px;border-bottom:1px solid var(--line);text-align:left}
+.room-table th,.rank-table th{font-weight:400;color:var(--muted);font-size:11px}
+.rank-table tr.me{background:#343225;color:var(--gold);font-weight:700}
+.order-card.accepted{border-color:#3f7053;background:#26352d}
+.order-card.rejected{opacity:.5}
+.order-type{color:var(--cyan);font-size:11px;font-weight:700}
+.load{font-size:11px;color:var(--muted)}
+.load.high{color:var(--red)}
+.vacancy{border-style:dashed;background:#20262b}
+.person-head{display:flex;align-items:flex-start;gap:8px}
+.avatar{width:34px;height:34px;background:#394149;border:1px solid #59636b;display:grid;place-items:center;font-weight:700;color:var(--gold);flex:0 0 auto}
+.person-main{min-width:0;flex:1}
+.attrs{display:flex;gap:4px;flex-wrap:wrap;margin-top:4px}
+.attr{font-size:10px;padding:1px 6px;border-radius:999px;background:#1a2024;color:var(--muted);border:1px solid #39434a}
+.empty-state{text-align:center;color:var(--muted);padding:30px 10px;font-size:13px}
+.log{max-height:460px;overflow-y:auto;font-size:12px}
+.log p{padding:5px 2px;border-bottom:1px dashed #364047;color:var(--muted)}
+.log p.good{color:var(--green)}.log p.bad{color:var(--red)}.log p.month{color:var(--gold);font-weight:700}
+.mask{position:fixed;inset:0;background:rgba(7,9,10,.82);display:none;align-items:center;justify-content:center;padding:14px;z-index:50}
+.mask.show{display:flex}
+.modal{width:100%;max-width:570px;max-height:88vh;overflow-y:auto;background:var(--panel);border:1px solid var(--gold);border-radius:9px;padding:17px;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.modal h2{font-size:17px;color:var(--gold);margin-bottom:7px}
+.modal-body{font-size:14px;white-space:pre-line;color:var(--text);margin-bottom:12px}
+.modal-options{display:flex;flex-direction:column;gap:7px}
+.modal-options button{text-align:left;padding:10px 12px;line-height:1.4}
+.modal-options button small{display:block;color:var(--muted);font-size:11px;margin-top:2px}
+.report-line{display:flex;justify-content:space-between;gap:10px;border-bottom:1px dashed #3a444b;padding:4px 0;font-size:12px}
+.report-line span:last-child{font-weight:700;text-align:right}
+.ending{position:fixed;inset:0;z-index:60;background:rgba(9,11,12,.95);display:none;align-items:flex-start;justify-content:center;overflow-y:auto;padding:18px}
+.ending.show{display:flex}
+.end-card{width:100%;max-width:560px;background:#22282d;border:2px solid var(--gold);border-radius:9px;padding:22px 18px;text-align:center;margin:auto}
+.end-card .eyebrow{font-size:11px;color:var(--muted)}
+.end-card h2{font-size:25px;color:var(--gold);margin:7px 0}
+.end-card .story{text-align:left;white-space:pre-line;font-size:13px;line-height:1.7;margin:12px 0}
+.badges{display:flex;gap:5px;justify-content:center;flex-wrap:wrap;margin:10px 0}
+.badge{border:1px solid #6f5c31;color:var(--gold);border-radius:999px;padding:2px 8px;font-size:11px}
+#nameInput{width:100%;background:#14191c;color:var(--text);border:1px solid var(--line);border-radius:7px;padding:9px;font-size:15px}
+@media(max-width:700px){
+  .app{padding:7px 7px calc(58px + env(safe-area-inset-bottom))}
+  .brand h1{font-size:16px}.brand p{display:none}.seal{width:32px;height:32px;font-size:17px}
+  .datebox{font-size:10px}.datebox b{font-size:12px}
+  .stats{grid-template-columns:repeat(3,1fr)}.stat .value{font-size:15px}
+  .stat .tip{position:fixed;top:auto;bottom:12px;left:10px;right:10px;width:auto;transform:none}
+  .price-grid{grid-template-columns:1fr}.price-row{grid-template-columns:1fr auto}
+  .pricing.compact .price-grid{grid-template-columns:repeat(3,1fr)}
+  .pricing.compact .price-row{grid-template-columns:1fr;gap:2px}.pricing.compact .stepper{justify-content:space-between}
+  .actions{grid-template-columns:repeat(3,1fr)}
+  .energy .hint{display:none}.panel{padding:8px}.metric-grid{grid-template-columns:repeat(2,1fr)}
+  .modal{padding:14px 12px;max-height:84vh}.modal h2{font-size:16px}
+  .top-actions .icon{width:32px;height:32px}
+}
+@media(max-width:390px){
+  .pricing.compact .price-grid{grid-template-columns:1fr}.pricing.compact .price-row{grid-template-columns:1fr auto}
+  .brand{gap:6px}.stats{gap:4px}.stat{padding:5px 2px}.tabs button{font-size:12px}
+}
+</style>
+</head>
+<body>
+<main class="app" id="app">
+  <header class="topbar">
+    <div class="brand"><div class="seal">雾</div><div><h1>雾都宾馆</h1><p>FOG CITY HOTEL · 1998</p></div></div>
+    <div class="top-actions">
+      <div class="datebox">任期第<b id="monthText">1</b>月<br>还剩<span id="leftText">24</span>个月</div>
+      <button class="icon" id="resetBtn" title="重新开始" aria-label="重新开始">↻</button>
+    </div>
+  </header>
+  <section class="stats" id="stats"></section>
+  <section class="forecast" id="forecast"></section>
+  <section class="pricing compact" id="pricing"></section>
+  <section class="energy">
+    <span class="energy-dots" id="energyDots">●●●●</span>
+    <span class="hint">每月4点行动力，定价和查看报表不消耗行动力</span>
+    <button class="primary" id="endMonthBtn">结束本月</button>
+  </section>
+  <section class="actions" id="actions"></section>
+  <nav class="tabs" id="tabs">
+    <button data-tab="operate" class="on">经营</button>
+    <button data-tab="orders">订单</button>
+    <button data-tab="team">团队</button>
+    <button data-tab="relations">关系</button>
+    <button data-tab="rank">排行</button>
+    <button data-tab="log">日志</button>
+  </nav>
+  <section class="panel" id="panel"></section>
+</main>
+<div class="mask" id="mask"><div class="modal"><h2 id="modalTitle"></h2><div class="modal-body" id="modalBody"></div><div class="modal-options" id="modalOptions"></div></div></div>
+<div class="ending" id="ending"><div class="end-card" id="endCard"></div></div>
+<script>
+"use strict";
+
+const SAVE_KEY = "wudu_hotel_save_v1";
+const SAVE_VERSION = 1;
+const ROOM_TYPES = {
+  standard:{name:"标准间",count:90,base:318,min:188,max:588,step:20},
+  business:{name:"商务房",count:30,base:468,min:288,max:888,step:30},
+  suite:{name:"套房",count:6,base:888,min:588,max:1688,step:50},
+};
+const DEPARTMENTS = {
+  front:{name:"前厅部",short:"前厅",need:12,start:10,wage:.62,color:"blue"},
+  rooms:{name:"客房部",short:"客房",need:30,start:26,wage:.58,color:"cyan"},
+  fb:{name:"餐饮宴会部",short:"餐饮",need:28,start:22,wage:.65,color:"gold"},
+  sales:{name:"市场销售部",short:"销售",need:6,start:5,wage:.82,color:"green"},
+  engineering:{name:"工程安保部",short:"工程",need:10,start:8,wage:.70,color:"red"},
+  admin:{name:"人力财务部",short:"人财",need:6,start:6,wage:.78,color:"blue"},
+};
+const POSTS = [
+  {id:"vp_ops",name:"运营副总经理",rank:3,dept:"operations"},
+  {id:"vp_business",name:"经营副总经理",rank:3,dept:"business"},
+  ...Object.keys(DEPARTMENTS).map(d=>({id:`mgr_${d}`,name:`${DEPARTMENTS[d].name}经理`,rank:2,dept:d})),
+  ...Object.keys(DEPARTMENTS).map(d=>({id:`sup_${d}`,name:`${DEPARTMENTS[d].name}主管`,rank:1,dept:d})),
+];
+const POST_MAP = Object.fromEntries(POSTS.map(p=>[p.id,p]));
+const EMPLOYEE_SEEDS = [
+  {id:1,name:"赵崇德",dept:"front",post:"vp_ops",skill:4,manage:4,loyalty:38,fav:28,faction:"旧班底",salary:2.8,trait:"资格最老，讲话慢，酒店里一半人叫他赵总",secret:"protect_old"},
+  {id:2,name:"乔玉琴",dept:"front",post:"mgr_front",skill:4,manage:3,loyalty:52,fav:42,faction:"中立",salary:1.8,trait:"笑脸迎客，转身就能把投诉拆得明明白白"},
+  {id:3,name:"唐秋月",dept:"rooms",post:"mgr_rooms",skill:5,manage:3,loyalty:46,fav:35,faction:"旧班底",salary:1.9,trait:"闭着眼都知道哪间房的地毯该换了",secret:"linen_supplier"},
+  {id:4,name:"何卫国",dept:"fb",post:"mgr_fb",skill:4,manage:2,loyalty:41,fav:34,faction:"旧班底",salary:2.0,trait:"婚宴菜单张口就来，采购账却从不让别人碰",secret:"kickback"},
+  {id:5,name:"郭劲峰",dept:"engineering",post:"mgr_engineering",skill:4,manage:3,loyalty:60,fav:40,faction:"中立",salary:1.9,trait:"腰上永远挂着一大串钥匙，半夜电话也接"},
+  {id:6,name:"刘文静",dept:"admin",post:"mgr_admin",skill:4,manage:4,loyalty:48,fav:38,faction:"集团派",salary:1.9,trait:"工资表和供应商账期都在她脑子里"},
+  {id:7,name:"谭小川",dept:"front",post:"sup_front",skill:3,manage:2,loyalty:58,fav:45,faction:"年轻派",salary:1.1,trait:"英语不错，处理醉客的经验更多"},
+  {id:8,name:"孙艳红",dept:"rooms",post:"sup_rooms",skill:4,manage:3,loyalty:66,fav:43,faction:"旧班底",salary:1.1,trait:"查房时戴白手套，保洁员见她就紧张"},
+  {id:9,name:"罗霞",dept:"fb",post:"sup_fb",skill:3,manage:4,loyalty:62,fav:46,faction:"中立",salary:1.2,trait:"宴会厅再乱，她拿起对讲机就能镇住"},
+  {id:10,name:"孟帆",dept:"sales",post:"sup_sales",skill:4,manage:2,loyalty:44,fav:39,faction:"年轻派",salary:1.3,trait:"朋友圈有五千人，客户消息从不隔夜"},
+];
+const EMP_NAMES = ["周南","许嘉禾","陈放","魏然","林晓荷","蒋云舒","吴峥","冯栩","郑雨晴","韩峰","秦悦","方屿","夏宁","叶澜","杜清和","宋遥","顾凯","沈青","马骁","程瑾","陶然","白露","苏航","梁安"];
+const EMP_TRAITS = {
+  front:["站在大堂里就让人觉得事情有人管","处理投诉不急不躁，客人骂完还能加微信","英语和重庆话都说得很利索"],
+  rooms:["掀开床角就知道这间房谁打扫的","对布草损耗和客房消耗品特别敏感","做房速度快，细节也不糊弄"],
+  fb:["婚宴翻台像排兵布阵","能记住常客的酒水和忌口","厨房和宴会厅两边都服他"],
+  sales:["电话打到对方不好意思不见面","企业行政和旅行社都有些人脉","会做平台活动，也懂得守价格"],
+  engineering:["听声音就知道空调哪里不对","消防台账做得像教科书","电梯、锅炉、弱电都摸过"],
+  admin:["表格一眼能看出差一分钱","劳动合同和排班漏洞抓得很准","供应商报价能砍到对方沉默"],
+};
+const NPC_SEEDS = [
+  {id:"shen",name:"沈敬山",title:"集团董事长",group:"集团",fav:38,pref:"report",avoid:"gift",hint:"只看结果，不爱听过程，但记得每一笔追加预算。",perk:"季度考核时有机会获得额外耐心"},
+  {id:"cheng",name:"程雪岚",title:"集团分管副总",group:"集团",fav:42,pref:"help",avoid:"dinner",hint:"你这次空降是她提的名，她最怕你被旧班底架空。",perk:"人事调整阻力降低"},
+  {id:"ma",name:"马会宁",title:"集团财务总监",group:"集团",fav:34,pref:"report",avoid:"gift",hint:"不喝酒，不收东西，现金流预测要精确到周。",perk:"现金紧张时可获得一次周转"},
+  {id:"qin",name:"秦书礼",title:"文旅部门联系人",group:"外部",fav:32,pref:"report",avoid:"gift",hint:"讲话客气，最看重接待方案和城市形象。",perk:"带来会议和文旅活动订单"},
+  {id:"luo",name:"罗峥",title:"消防检查负责人",group:"外部",fav:28,pref:"report",avoid:"dinner",hint:"每次来都先看疏散通道，从不在酒店吃饭。",perk:"检查前可能给出含蓄提醒"},
+  {id:"su",name:"苏晴",title:"OTA区域经理",group:"渠道",fav:36,pref:"dinner",avoid:"gift",hint:"说话快，手里握着平台流量和差评申诉入口。",perk:"平台曝光提高，佣金活动更划算"},
+  {id:"xu",name:"许鹤年",title:"渝州商旅旅行社老板",group:"客户",fav:40,pref:"dinner",avoid:"report",hint:"最在意团队价和导游房，账期总想再拖一拖。",perk:"稳定旅行团订单"},
+  {id:"liang",name:"梁曼",title:"婚礼策划公司主理人",group:"客户",fav:38,pref:"help",avoid:"report",hint:"审美挑剔，朋友圈一条照片能带来十场婚礼。",perk:"高价婚宴订单出现率提高"},
+  {id:"zhou",name:"周启明",title:"恒川科技行政总监",group:"客户",fav:35,pref:"help",avoid:"gift",hint:"行程常变，但公司差旅和年会预算很扎实。",perk:"企业协议房和年会订单"},
+  {id:"fu",name:"傅闻洲",title:"山城会展总经理",group:"客户",fav:30,pref:"dinner",avoid:"gift",hint:"喜欢当场拍板，最烦设备掉链子。",perk:"大型会议订单"},
+  {id:"zhao",name:"赵崇德",title:"酒店运营副总",group:"内部",fav:28,pref:"help",avoid:"gift",hint:"旧班底的主心骨。尊重他有用，但让得太多也会失去权威。",perk:"旧班底的人事阻力降低",empId:1},
+  {id:"tang",name:"唐秋月",title:"客房部经理",group:"内部",fav:35,pref:"report",avoid:"dinner",hint:"认规矩也认本事，客房部的人都听她的。",perk:"客房服务更稳定",empId:3},
+];
+const COMPETITOR_SEEDS = [
+  {name:"云顶国际",manager:"顾闻达",style:"高端商务",score:72,adr:618,growth:.7},
+  {name:"两江商务酒店",manager:"周岱",style:"企业协议",score:66,adr:438,growth:.8},
+  {name:"金港大饭店",manager:"贺兰",style:"婚宴宴会",score:63,adr:358,growth:.65},
+  {name:"新岸酒店",manager:"林简",style:"OTA低价",score:58,adr:298,growth:.9},
+];
+const SEASONS = [
+  {name:"元旦淡季",factor:.88,banquet:1.05},{name:"春节宴席",factor:.72,banquet:1.35},
+  {name:"春季回暖",factor:1.02,banquet:1.05},{name:"会展旺季",factor:1.12,banquet:1.08},
+  {name:"婚礼旺季",factor:1.06,banquet:1.25},{name:"毕业旅行",factor:1.03,banquet:1.08},
+  {name:"暑期客流",factor:1.12,banquet:.92},{name:"高温淡季",factor:.92,banquet:.88},
+  {name:"秋季会展",factor:1.15,banquet:1.12},{name:"黄金周",factor:1.26,banquet:1.10},
+  {name:"婚宴旺季",factor:1.05,banquet:1.28},{name:"年会旺季",factor:1.10,banquet:1.32},
+];
+const RISK_NAMES = {fire:"消防",hygiene:"卫生",equipment:"设备",labor:"用工",finance:"财务"};
+const RISK_WARNINGS = {
+  fire:{title:"安全门又卡住了",body:"夜班保安说，三楼西侧的防火门最近总是回弹不到位。工程部拿润滑油处理过一次，第二天又卡住了。",fix:"停掉半层，彻底检修",fixCost:28,ignore:"先贴张『保持关闭』",fixDelta:-28,ignoreDelta:12},
+  hygiene:{title:"布草间有股怪味",body:"客房主管在布草间站了很久。新送来的一批毛巾看着雪白，但烘干后总有股说不出的味道。供应商坚持检测合格。",fix:"退货并全面抽检",fixCost:24,ignore:"先把这一批用完",fixDelta:-26,ignoreDelta:13},
+  equipment:{title:"锅炉房的声音不对",body:"凌晨换班时，值班工听见锅炉启动声比平时沉。他在交接本上画了两个圈，郭劲峰说最好请厂家来一趟。",fix:"请厂家停机检修",fixCost:36,ignore:"先观察几天",fixDelta:-30,ignoreDelta:14},
+  labor:{title:"排班表被人拍了照",body:"一张连续加班的排班表在员工群里流传。照片很快被撤回，但人力经理说，最近已经有人问过加班费怎么算。",fix:"补休并补发加班费",fixCost:22,ignore:"让部门内部消化",fixDelta:-24,ignoreDelta:14},
+  finance:{title:"发票号码接不上",body:"财务抽查餐饮采购时发现三张发票号码不连续。何卫国解释说供应商换了开票点，但刘文静没有立刻点头。",fix:"暂停付款，做专项审计",fixCost:18,ignore:"业务要紧，先付款",fixDelta:-27,ignoreDelta:15},
+};
+
+let S = null;
+let modalQueue = [];
+const $ = s=>typeof document==="undefined"?null:document.querySelector(s);
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const round=(v,d=1)=>+v.toFixed(d);
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+const rand=(a,b)=>a+Math.random()*(b-a);
+const monthIndex=s=>(s.month-1)%12;
+const seasonOf=s=>SEASONS[monthIndex(s)];
+const postOf=e=>e.post?POST_MAP[e.post]:null;
+const employeeById=(s,id)=>s.employees.find(e=>e.id===id);
+const npcById=(s,id)=>s.npcs.find(n=>n.id===id);
+const vacancy=(s,id)=>!s.employees.some(e=>e.post===id);
+const standby=s=>s.employees.filter(e=>!e.post);
+const managerFor=(s,dept)=>s.employees.find(e=>e.post===`mgr_${dept}`);
+const supervisorFor=(s,dept)=>s.employees.find(e=>e.post===`sup_${dept}`);
+
+function log(s,cls,text){s.log.unshift({cls,text});if(s.log.length>140)s.log.length=140;}
+function add(s,key,value){
+  if(key==="rating")s.rating=clamp(s.rating+value,1,5);
+  else if(["morale","brand"].includes(key))s[key]=clamp(s[key]+value,0,100);
+  else s[key]+=value;
+  s.lastDelta[key]=(s.lastDelta[key]||0)+value;
+}
+function risk(s,key,value){s.risks[key]=clamp(s.risks[key]+value,0,120);}
+function relation(s,id,value){const n=npcById(s,id);if(n)n.fav=clamp(n.fav+value,0,100);if(n&&n.empId){const e=employeeById(s,n.empId);if(e)e.fav=clamp(e.fav+value,0,100);}}
+function totalFrontline(s){return Object.values(s.departments).reduce((n,d)=>n+d.staff,0)}
+function totalPayroll(s){
+  const frontline=Object.entries(s.departments).reduce((n,[id,d])=>n+d.staff*DEPARTMENTS[id].wage,0);
+  const named=s.employees.reduce((n,e)=>n+e.salary,0);
+  return round(frontline+named,1);
+}
+function rolePower(s,dept){
+  const d=s.departments[dept], m=managerFor(s,dept), sup=supervisorFor(s,dept);
+  const staffRatio=clamp(d.staff/DEPARTMENTS[dept].need,.45,1.15);
+  const leader=((m?m.skill*.09+m.manage*.07:.18)+(sup?sup.skill*.05+sup.manage*.04:.08));
+  const vp=s.employees.filter(e=>postOf(e)?.rank===3).reduce((n,e)=>n+e.manage*.015,0);
+  return clamp(staffRatio*(.48+leader+vp)*(0.72+s.morale/360),.25,1.35);
+}
+function relationshipDemand(s){
+  let v=0;
+  for(const n of s.npcs){if(n.fav>=60){if(["su","xu","liang","zhou","fu","qin"].includes(n.id))v+=.018;}}
+  return v;
+}
+function orderTotals(s){
+  return s.orders.filter(o=>o.status==="accepted").reduce((a,o)=>{
+    a.roomNights+=o.roomNights||0;a.roomRevenue+=o.roomRevenue||0;a.eventRevenue+=o.eventRevenue||0;
+    a.fbRevenue+=o.fbRevenue||0;a.load+=o.load||0;a.delayed+=o.delayed||0;return a;
+  },{roomNights:0,roomRevenue:0,eventRevenue:0,fbRevenue:0,load:0,delayed:0});
+}
+function calculateForecast(s){
+  const season=seasonOf(s), sales=rolePower(s,"sales"), front=rolePower(s,"front"), rooms=rolePower(s,"rooms");
+  const order=orderTotals(s), keys=Object.keys(ROOM_TYPES), roomRows=[];
+  let sold=0, roomRevenue=0, capacity=0;
+  for(const key of keys){
+    const r=ROOM_TYPES[key], price=s.prices[key], elastic=key==="suite"?.72:1.08;
+    const supportedRate=r.base*(1+.045*Math.max(0,(s.facilities.rooms||1)-1));
+    const priceFactor=Math.pow(supportedRate/price,elastic);
+    const typeBase=key==="standard"?.46:key==="business"?.39:.24;
+    let occ=typeBase*season.factor*priceFactor*(.72+s.brand/180)*(.76+s.rating/13)*(.72+sales*.30);
+    occ*=1+s.marketBoost+relationshipDemand(s);
+    occ=clamp(occ,.08,.94);
+    const nights=r.count*30, typeSold=nights*occ;
+    sold+=typeSold;capacity+=nights;roomRevenue+=typeSold*price/10000;
+    roomRows.push({key,name:r.name,count:r.count,price,occ,typeSold,revenue:typeSold*price/10000});
+  }
+  sold+=order.roomNights;roomRevenue+=order.roomRevenue;
+  let occupancy=clamp(sold/capacity,0,1.12);
+  const serviceCapacity=(front+rooms)/2;
+  const overload=Math.max(0,occupancy-.82)+Math.max(0,order.load-rolePower(s,"fb")*1.35)*.08;
+  const walkInFb=22+occupancy*26*rolePower(s,"fb");
+  const fbRevenue=walkInFb+order.fbRevenue;
+  const eventFacility=1+.06*Math.max(0,(s.facilities.banquet||1)-1)+.04*Math.max(0,(s.facilities.conference||1)-1);
+  const eventRevenue=order.eventRevenue*eventFacility;
+  const adr=sold>0?roomRevenue*10000/sold:0;
+  const payroll=totalPayroll(s), utilities=14+occupancy*16+eventRevenue*.045;
+  const procurement=fbRevenue*.36, ota=roomRevenue*s.otaShare*.15;
+  const maintenance=5+s.facilityAge*1.2, debt=10, overtime=overload*38;
+  const revenue=roomRevenue+fbRevenue+eventRevenue;
+  const expense=payroll+utilities+procurement+ota+maintenance+debt+overtime;
+  const cashNet=revenue-expense-order.delayed;
+  return {season,roomRows,sold,capacity,occupancy,adr,revpar:adr*occupancy,roomRevenue,fbRevenue,eventRevenue,revenue,payroll,utilities,procurement,ota,maintenance,debt,overtime,expense,cashNet,overload,serviceCapacity,order};
+}
+function makeCandidates(s){
+  const used=s.employees.map(e=>e.name);const out=[];
+  while(out.length<3){
+    const name=pick(EMP_NAMES);if(used.includes(name)||out.some(e=>e.name===name))continue;
+    const dept=pick(Object.keys(DEPARTMENTS));
+    const skill=2+Math.floor(Math.random()*4),manage=1+Math.floor(Math.random()*4),loyalty=35+Math.floor(Math.random()*41);
+    out.push({id:null,name,dept,post:null,skill:clamp(skill,1,5),manage:clamp(manage,1,5),loyalty,fav:40,faction:pick(["中立","年轻派","集团派"]),salary:round(.72+skill*.17+manage*.12,1),trait:pick(EMP_TRAITS[dept])});
+  }
+  return out;
+}
+function createOrder(s,index){
+  const id=`${s.month}_${index}_${Math.floor(Math.random()*9999)}`;
+  const relationBonus=id=>npcById(s,id)?.fav>=60?1.18:1;
+  const pool=[
+    ()=>({type:"旅行团",title:"渝州商旅 · 三晚团队",client:"xu",roomNights:120,roomRevenue:3.1*relationBonus("xu"),eventRevenue:0,fbRevenue:5.8,load:1.0,delayed:1.8,desc:"40间标准间住三晚，团队价压得低，早餐必须六点开。"}),
+    ()=>({type:"企业协议",title:"恒川科技 · 月度差旅",client:"zhou",roomNights:86,roomRevenue:3.8*relationBonus("zhou"),eventRevenue:0,fbRevenue:1.2,load:.45,delayed:2.2,desc:"入住零散但稳定，要求延迟退房和季度结算。"}),
+    ()=>({type:"婚宴",title:"梁曼婚礼工作室 · 周末婚宴",client:"liang",roomNights:18,roomRevenue:.8,eventRevenue:38*relationBonus("liang"),fbRevenue:32,load:1.45,delayed:0,desc:"28桌婚宴，布置要求高，撞上客房满房会很吃服务。"}),
+    ()=>({type:"大型会议",title:"山城会展 · 行业论坛",client:"fu",roomNights:72,roomRevenue:3.5,eventRevenue:26*relationBonus("fu"),fbRevenue:16,load:1.25,delayed:5,desc:"三百人会议加住宿，设备和网络不能掉链子。"}),
+    ()=>({type:"OTA活动",title:"平台超级周末",client:"su",roomNights:110,roomRevenue:3.2*relationBonus("su"),eventRevenue:0,fbRevenue:4,load:.75,delayed:0,desc:"平台给流量，但房价低、佣金高，容易吸引挑剔客人。",ota:true}),
+    ()=>({type:"政府接待",title:"城市交流团接待",client:"qin",roomNights:55,roomRevenue:3.6,eventRevenue:12,fbRevenue:11,load:1.0,delayed:4,desc:"标准细、流程多，做好了能露脸，出错也会被记住。",vip:true}),
+    ()=>({type:"年会",title:"制造企业年度答谢会",client:null,roomNights:38,roomRevenue:1.6,eventRevenue:22,fbRevenue:25,load:1.2,delayed:1,desc:"预算还行，但临时节目多，宴会厅可能通宵搭台。"}),
+    ()=>({type:"长住客",title:"剧组长住包房",client:null,roomNights:150,roomRevenue:6.2,eventRevenue:0,fbRevenue:6,load:.85,delayed:3,desc:"连续住一个月，隐私要求高，也可能制造网络话题。"}),
+  ];
+  const base=pick(pool)();
+  const variation=rand(.88,1.14);
+  for(const k of ["roomNights","roomRevenue","eventRevenue","fbRevenue","delayed"])if(base[k])base[k]=round(base[k]*variation,k==="roomNights"?0:1);
+  return {...base,id,status:"open",month:s.month};
+}
+function generateOrders(s){return [0,1,2].map(i=>createOrder(s,i))}
+function initialState(){
+  const s={version:SAVE_VERSION,month:1,energy:4,over:false,playerName:"无名总经理",startCash:320,cash:320,rating:3.8,morale:46,brand:48,lastDelta:{},
+    prices:{standard:318,business:468,suite:888},last:{occupancy:.48,adr:336,revpar:161,profit:-8,revenue:102},
+    departments:{},employees:EMPLOYEE_SEEDS.map(e=>({...e})),empSeq:20,candidates:[],npcs:NPC_SEEDS.map(n=>({...n,lastMet:0,lastMethod:null,repeat:0,tried:{}})),
+    competitors:COMPETITOR_SEEDS.map(c=>({...c})),risks:{fire:32,hygiene:29,equipment:46,labor:24,finance:31},warnings:{fire:0,hygiene:0,equipment:0,labor:0,finance:0},warningMonth:{},
+    facilityAge:3,facilities:{rooms:1,banquet:1,conference:1,safety:1},otaShare:.45,marketBoost:0,serviceBoost:0,orders:[],usedEvents:[],lastEvent:null,flags:{},chain:[],
+    track:{profit:0,revenue:0,weddings:0,meetings:0,roomNights:0,maxOcc:.48,minCash:320,hires:0,promotions:0,demotions:0,fires:0,relations:0,repairs:0,gray:0,complaints:0},
+    tab:"operate",teamFilter:"all",relationFilter:"all",log:[]};
+  for(const [id,d] of Object.entries(DEPARTMENTS))s.departments[id]={staff:d.start};
+  s.candidates=makeCandidates(s);s.orders=generateOrders(s);
+  log(s,"month","第1月 · 你空降雾都宾馆。沈敬山只说了一句：两年后，我看结果，也看这家店还在不在。");
+  return s;
+}
+
+function eventOption(text,sub,fn,disabled=false){return {text,sub,fn,disabled}}
+const EVENTS = [
+  {id:"influencer",title:"探店博主突然入住",body:"一个本地探店博主没有提前打招呼，举着相机从大堂拍到客房。前台认出了她，但她已经开始直播。",opts:()=>[
+    eventOption("按普通客人接待","不干预内容，考验真实服务",()=>{if(rolePower(S,"front")>.82&&rolePower(S,"rooms")>.82){add(S,"rating",.08);add(S,"brand",5);log(S,"good","直播效果意外不错，评论区都在问房价。评分+0.08，品牌+5。")}else{add(S,"rating",-.1);add(S,"brand",-3);S.track.complaints++;log(S,"bad","镜头拍到走廊杂物和前台冷脸，差评很快跟了上来。")}}),
+    eventOption("升级套房并安排专人","花6万，曝光更稳，但有人说你区别对待",()=>{add(S,"cash",-6);add(S,"brand",4);add(S,"rating",.04);risk(S,"finance",2)})]},
+  {id:"overbook",title:"平台超售了六间房",cond:()=>calculateForecast(S).occupancy>.82,body:"晚上十点，OTA后台和前台房态对不上，六组客人拖着行李站在大堂。附近同档酒店也快满了。",opts:()=>[
+    eventOption("高价送到云顶国际","花4万，保住口碑",()=>{add(S,"cash",-4);add(S,"rating",.03);risk(S,"finance",-1)}),
+    eventOption("现场协调，能住的先住","省钱，但赌客人脾气",()=>{if(Math.random()<.45){add(S,"rating",-.14);add(S,"brand",-5);S.track.complaints++}else add(S,"morale",2);risk(S,"labor",4)})]},
+  {id:"wedding_overtime",title:"婚宴搭台拖到凌晨",body:"婚庆公司临时加了一套升降舞台。宴会厅员工已经连上十二个小时，明早还有一场会议。",opts:()=>[
+    eventOption("加钱请外援通宵做","花8万，员工能喘口气",()=>{add(S,"cash",-8);add(S,"morale",3);risk(S,"labor",-4)}),
+    eventOption("自己人顶住","省8万，团队负荷继续上升",()=>{add(S,"morale",-4);risk(S,"labor",10);risk(S,"equipment",4)})]},
+  {id:"bride_room",title:"新娘房的镜子起雾",body:"婚礼摄影刚开机，套房浴室镜面除雾失效。新娘在房里掉眼泪，梁曼站在门口等你的处理。",opts:()=>[
+    eventOption("立刻换房并免掉套房费","花1万，好感和口碑都有交代",()=>{add(S,"cash",-1);add(S,"rating",.04);relation(S,"liang",5)}),
+    eventOption("工程部十分钟抢修","能力足够就漂亮解决",()=>{if(rolePower(S,"engineering")>.82){relation(S,"liang",7);add(S,"brand",2)}else{relation(S,"liang",-6);add(S,"rating",-.06);risk(S,"equipment",5)}})]},
+  {id:"foreign_guest",title:"外国客人护照丢了",body:"一位外国客人在大堂急得团团转，怀疑护照落在出租车上。值班经理英语一般，报警流程也不熟。",opts:()=>[
+    eventOption("让谭小川全程陪同","前厅有合适的人，士气和口碑都可能提升",()=>{const e=employeeById(S,7);if(e&&e.post){add(S,"rating",.05);add(S,"morale",2);e.fav=clamp(e.fav+4,0,100)}else add(S,"rating",-.04)}),
+    eventOption("按标准流程交给派出所","稳妥，但体验一般",()=>{add(S,"brand",1)})]},
+  {id:"lost_jewel",title:"套房里少了一条项链",body:"客人退房两小时后打来电话，说一条价值十几万的项链不见了。查房记录显示两名保洁进过房间。",opts:()=>[
+    eventOption("封存记录，报警调查","士气-2，但把程序走完整",()=>{add(S,"morale",-2);risk(S,"labor",-3);risk(S,"finance",-2)}),
+    eventOption("先赔客人，内部慢慢查","花12万，事情暂时压下去",()=>{add(S,"cash",-12);add(S,"rating",.02);risk(S,"finance",8)})]},
+  {id:"camera_rumor",title:"网上有人说房间有偷拍设备",body:"一张模糊照片在社交平台传播，发帖人说在雾都宾馆插座里发现摄像头。房号没有拍清。",opts:()=>[
+    eventOption("主动报警并封房排查","花10万，短期品牌受损，但后续更稳",()=>{add(S,"cash",-10);add(S,"brand",-2);risk(S,"equipment",-12);risk(S,"finance",-3)}),
+    eventOption("发律师函，认定是造谣","赌照片是假的",()=>{if(Math.random()<.65){add(S,"brand",3)}else{add(S,"rating",-.22);add(S,"brand",-10);S.track.complaints+=2}})]},
+  {id:"hotwater",title:"高层客房热水忽冷忽热",body:"最近三天，十二楼陆续有客人反映洗澡时水温跳动。工程部说可能是阀门，也可能是锅炉循环。",opts:()=>[
+    eventOption("停半层做彻底检查","花20万，少卖一些房",()=>{add(S,"cash",-20);risk(S,"equipment",-22);S.track.repairs++}),
+    eventOption("给投诉客人送早餐券","花3万，先维持营业",()=>{add(S,"cash",-3);risk(S,"equipment",10);add(S,"rating",-.02)})]},
+  {id:"elevator",title:"婚宴散场时电梯停了",body:"两部客梯里有一部突然停在七楼，里面十二个人。应急电话接通了，但有人已经开始拍视频。",opts:()=>[
+    eventOption("启动救援并公开说明","工程能力决定结果",()=>{if(rolePower(S,"engineering")>.82){add(S,"brand",2);risk(S,"equipment",-6)}else{add(S,"rating",-.12);risk(S,"equipment",8)}}),
+    eventOption("先劝大家别发视频","关系处理可能适得其反",()=>{add(S,"brand",-4);risk(S,"finance",4);S.track.complaints++})]},
+  {id:"ac_fail",title:"宴会厅空调罢工",body:"三百人的论坛刚开始，宴会厅温度一路往上。傅闻洲站在控制台旁边，脸色比主持人的西装还黑。",opts:()=>[
+    eventOption("租移动空调，立刻补位","花14万，尽量保住客户",()=>{add(S,"cash",-14);relation(S,"fu",3);risk(S,"equipment",-4)}),
+    eventOption("开门通风，坚持结束","省钱，会议体验明显下降",()=>{relation(S,"fu",-8);add(S,"rating",-.05);add(S,"brand",-3)})]},
+  {id:"breakfast",title:"早餐台有人腹痛",body:"一个旅行团里五名客人早餐后肚子不舒服。导游还没报警，但已经把所有餐食拍了照。",opts:()=>[
+    eventOption("送医、留样并主动上报","花9万，暂停早餐一天",()=>{add(S,"cash",-9);risk(S,"hygiene",-16);relation(S,"xu",2)}),
+    eventOption("私下赔偿，请旅行社协调","花5万，事情可能压下去",()=>{add(S,"cash",-5);relation(S,"xu",4);risk(S,"hygiene",12);risk(S,"finance",6);S.track.gray++})]},
+  {id:"supplier_price",title:"食材供应商突然涨价",body:"长期合作的供应商通知，下月起肉类和海鲜统一涨价12%。何卫国说换供应商会影响出品。",opts:()=>[
+    eventOption("重新招标","花5万评审，降低财务隐患",()=>{add(S,"cash",-5);risk(S,"finance",-12);relation(S,"zhao",-2)}),
+    eventOption("接受涨价，保持稳定","本月多花8万",()=>{add(S,"cash",-8);risk(S,"finance",4);add(S,"morale",1)})]},
+  {id:"chef_poach",title:"行政总厨被对手挖角",body:"金港大饭店开出高薪，行政总厨把条件摆到你桌上。婚宴旺季已经排了不少单。",opts:()=>[
+    eventOption("加薪留下","以后每月管理工资增加0.5万，士气+3",()=>{const e=employeeById(S,4);if(e)e.salary=round(e.salary+.5,1);add(S,"morale",3)}),
+    eventOption("让他走，提拔罗霞代理","餐饮短期波动，给年轻人机会",()=>{const old=employeeById(S,4),young=employeeById(S,9);if(old)S.employees=S.employees.filter(e=>e.id!==4);if(young){young.post="mgr_fb";young.salary=round(young.salary+.5,1)}add(S,"morale",-2);risk(S,"hygiene",5)})]},
+  {id:"housekeeping_sick",title:"保洁员集体请病假",body:"客房部一个班组七个人同时请病假。唐秋月说不是巧合，她们对连续满房和计件标准早有意见。",opts:()=>[
+    eventOption("补发高峰津贴","花12万，缓和矛盾",()=>{add(S,"cash",-12);add(S,"morale",5);risk(S,"labor",-14)}),
+    eventOption("从外包公司临时调人","花7万，卫生质量看运气",()=>{add(S,"cash",-7);if(Math.random()<.5)risk(S,"hygiene",8);else add(S,"rating",.02);risk(S,"labor",3)})]},
+  {id:"front_conflict",title:"前台和客人拍桌子",body:"客人坚持凌晨退房也算钟点房，前台员工不肯让步，两边在大堂越吵越响。",opts:()=>[
+    eventOption("支持员工，按规则收费","士气+3，评分可能下降",()=>{add(S,"morale",3);add(S,"rating",-.05)}),
+    eventOption("给客人免单，事后教育员工","评分+0.03，士气-4",()=>{add(S,"cash",-.04);add(S,"rating",.03);add(S,"morale",-4)})]},
+  {id:"fake_review",title:"突然出现一批一星差评",body:"一晚上冒出十几条相似的一星评价，内容都说房间有霉味。苏晴说平台能申诉，但需要完整证据。",opts:()=>[
+    eventOption("组织取证，走平台申诉","花4万，销售能力高则成功",()=>{add(S,"cash",-4);if(rolePower(S,"sales")>.8){add(S,"rating",.06);relation(S,"su",3)}else add(S,"rating",-.05)}),
+    eventOption("找人刷五星盖过去","花3万，短期有效，暗处留痕",()=>{add(S,"cash",-3);add(S,"rating",.08);risk(S,"finance",10);S.track.gray++})]},
+  {id:"celebrity",title:"剧组要求封锁整层",body:"一个剧组临时要求封锁十二楼，不许其他客人靠近。长住收入不错，但正常住客已经开始抱怨电梯管制。",opts:()=>[
+    eventOption("接受封层，严格保护隐私","现金+18万，普通客人体验下降",()=>{add(S,"cash",18);add(S,"rating",-.04);add(S,"brand",3)}),
+    eventOption("拒绝额外要求","评分稳定，但剧组可能搬走",()=>{if(Math.random()<.6)add(S,"cash",-6);else add(S,"brand",1)})]},
+  {id:"conference_power",title:"会议进行到一半跳闸",body:"主屏幕黑了，麦克风也没声。傅闻洲盯着你，台上的嘉宾还保持着举话筒的姿势。",opts:()=>[
+    eventOption("启用备用线路","工程能力决定恢复速度",()=>{if(rolePower(S,"engineering")>.9){relation(S,"fu",5);add(S,"brand",2)}else{relation(S,"fu",-6);risk(S,"equipment",7)}}),
+    eventOption("直接退一半场租","花10万，客户先消气",()=>{add(S,"cash",-10);relation(S,"fu",2);risk(S,"equipment",3)})]},
+  {id:"tour_damage",title:"旅行团退房后房间一片狼藉",body:"六间房的地毯和床品都需要深度清洁，导游坚持说这是正常使用痕迹。",opts:()=>[
+    eventOption("向旅行社追偿","许鹤年好感-5，追回4万",()=>{add(S,"cash",4);relation(S,"xu",-5)}),
+    eventOption("自己承担","花4万，保住渠道关系",()=>{add(S,"cash",-4);relation(S,"xu",3);risk(S,"hygiene",2)})]},
+  {id:"guest_fall",title:"老人浴室滑倒",body:"一位老人洗澡时滑倒，家属认为防滑垫和扶手都不到位。客人还在医院检查。",opts:()=>[
+    eventOption("承担医药费并整改","花16万，设备与口碑更稳",()=>{add(S,"cash",-16);add(S,"rating",.02);risk(S,"equipment",-10)}),
+    eventOption("交给保险和法务","现金压力小，处理时间更长",()=>{add(S,"rating",-.08);risk(S,"finance",4)})]},
+  {id:"lost_child",title:"婚宴上孩子走丢了",body:"一个六岁孩子突然不见，家长在宴会厅急哭了。监控室和值班保安正在逐层寻找。",opts:()=>[
+    eventOption("暂停宴会广播找人","影响流程，但速度最快",()=>{if(rolePower(S,"engineering")>.7){add(S,"brand",4);add(S,"morale",2)}else add(S,"brand",-2)}),
+    eventOption("低调组织员工搜索","避免惊动全场，但风险更大",()=>{if(Math.random()<.7)add(S,"brand",2);else{add(S,"rating",-.12);risk(S,"labor",4)}})]},
+  {id:"wedding_fight",title:"婚宴敬酒打起来了",body:"两桌客人因为敬酒起了冲突，椅子翻了三把，旁边还有人在直播。",opts:()=>[
+    eventOption("保安立即分隔并报警","场面难看，但程序稳",()=>{add(S,"brand",-1);risk(S,"labor",-3)}),
+    eventOption("让双方长辈内部解决","不报警，赌人情能压住",()=>{if(Math.random()<.55)add(S,"brand",1);else{add(S,"rating",-.1);risk(S,"finance",5)}})]},
+  {id:"wine_rebate",title:"酒水商提出返点",body:"酒水供应商愿意给宴会销售团队一笔季度返点，只要合同继续锁三年。报价不算离谱，但返款不会走酒店公账。",opts:()=>[
+    eventOption("拒绝并重新比价","短期少赚，财务更干净",()=>{risk(S,"finance",-10);add(S,"morale",-1)}),
+    eventOption("默许团队拿返点","士气+4，暗处留下财务问题",()=>{add(S,"morale",4);risk(S,"finance",18);S.track.gray++})]},
+  {id:"purchase_gift",title:"供应商送来一箱购物卡",body:"中秋前，布草供应商送来一箱月饼。刘文静打开后发现，每盒月饼下面还压着一张购物卡。",opts:()=>[
+    eventOption("登记并退回","品牌+1，唐秋月好感-2",()=>{add(S,"brand",1);relation(S,"tang",-2);risk(S,"finance",-8)}),
+    eventOption("当员工福利发掉","士气+5，财务暗雷上升",()=>{add(S,"morale",5);risk(S,"finance",14);S.track.gray++})]},
+  {id:"ota_sale",title:"OTA要求参加全城大促",body:"苏晴发来活动方案：房价降18%，平台再给一轮首页曝光。竞争酒店几乎都报名了。",opts:()=>[
+    eventOption("参加大促","下月需求上升，房价收益下降",()=>{S.marketBoost+=.12;S.otaShare=clamp(S.otaShare+.12,.2,.8);relation(S,"su",4)}),
+    eventOption("守住房价","苏晴好感-3，品牌定位更稳",()=>{relation(S,"su",-3);add(S,"brand",2)})]},
+  {id:"price_war",title:"新岸酒店把房价打到238",body:"新岸酒店连续两周挂出238元含双早。你的前台每天都被问为什么贵。",opts:()=>[
+    eventOption("跟价一个月","需求上升，品牌-3",()=>{S.prices.standard=clamp(S.prices.standard-40,ROOM_TYPES.standard.min,ROOM_TYPES.standard.max);S.marketBoost+=.08;add(S,"brand",-3)}),
+    eventOption("不跟，强化商务服务","花10万，品牌+4",()=>{add(S,"cash",-10);add(S,"brand",4)})]},
+  {id:"poach_sales",title:"两江商务酒店来挖销售主管",cond:()=>!!employeeById(S,10),body:"孟帆拿着一份涨薪40%的offer来找你。他说不是非走不可，但也不能一直看不到上升空间。",opts:()=>[
+    eventOption("提拔他当销售经理","必须有经理空缺",()=>promoteEmployee(10,true),!vacancy(S,"mgr_sales")),
+    eventOption("加薪挽留","月薪+0.4万，好感+8",()=>{const e=employeeById(S,10);e.salary=round(e.salary+.4,1);e.fav=clamp(e.fav+8,0,100)}),
+    eventOption("让他走","销售能力短期下降",()=>{S.employees=S.employees.filter(e=>e.id!==10);add(S,"morale",-4)})]},
+  {id:"star_audit",title:"四星级复核通知",once:true,cond:()=>S.month>=8,body:"文旅部门通知，雾都宾馆将在三个月内接受四星级复核。检查范围包括服务、设施、安全和投诉记录。",opts:()=>[
+    eventOption("成立专项小组","花30万，服务和设施更稳",()=>{add(S,"cash",-30);S.serviceBoost+=.12;risk(S,"fire",-8);risk(S,"hygiene",-8);S.flags.starTeam=true}),
+    eventOption("按日常水平迎检","省钱，结果看平时积累",()=>{S.flags.starReview=true})]},
+  {id:"budget_cut",title:"集团要求压降成本",body:"集团财务发来红头邮件：本季度人工和采购成本必须下降8%，否则下次预算会被扣。",opts:()=>[
+    eventOption("冻结基层招聘","现金+8万，部门缺口继续存在",()=>{add(S,"cash",8);S.flags.hiringFreeze=S.month+2;relation(S,"ma",4);risk(S,"labor",5)}),
+    eventOption("拿经营结果顶回去","马会宁好感-5，员工士气+3",()=>{relation(S,"ma",-5);add(S,"morale",3)})]},
+  {id:"private_dinner",title:"董事长的私人接待",once:true,body:"沈敬山要在酒店安排一桌私人晚宴，不走公开接待流程。他只说：客人很重要，名单不要问。",opts:()=>[
+    eventOption("按最高标准办，不入公开宣传","花12万，沈敬山好感+8，财务暗雷上升",()=>{add(S,"cash",-12);relation(S,"shen",8);risk(S,"finance",10);S.track.gray++}),
+    eventOption("要求按集团流程补手续","财务更稳，沈敬山好感-6",()=>{risk(S,"finance",-5);relation(S,"shen",-6)})]},
+  {id:"employee_wedding",title:"老员工女儿结婚",body:"一位干了二十年的保洁员想在酒店办女儿婚宴，但按正常报价她承担不起。客房部不少人都来替她说情。",opts:()=>[
+    eventOption("按成本价办","少赚10万，士气+8",()=>{add(S,"cash",-10);add(S,"morale",8)}),
+    eventOption("制度面前一视同仁","现金不变，士气-5",()=>{add(S,"morale",-5)})]},
+  {id:"family_ill",title:"主管家里出了事",body:"孙艳红的父亲突然住院，她想请半个月假。客房部正缺人，唐秋月说排班实在挪不开。",opts:()=>[
+    eventOption("准假并请临时工","花6万，员工感受到人情味",()=>{add(S,"cash",-6);add(S,"morale",5);risk(S,"hygiene",2)}),
+    eventOption("请她先把旺季扛过去","客房稳定，员工关系受损",()=>{add(S,"morale",-4);const e=employeeById(S,8);if(e)e.fav=clamp(e.fav-10,0,100);risk(S,"labor",6)})]},
+  {id:"promotion_request",title:"有人来要位置",cond:()=>S.employees.some(e=>postOf(e)?.rank===1),body:"一名主管在汇报结束后没有走，坐在你对面说：『总经理，我干这个位置够久了。上面那个岗位，到底有没有我的机会？』",opts:()=>{
+    const e=pick(S.employees.filter(x=>postOf(x)?.rank===1));return[
+      eventOption(`承诺优先考虑${e.name}`,"好感+8；三个月不兑现会失望",()=>{e.fav=clamp(e.fav+8,0,100);S.flags[`promise_${e.id}`]=S.month+3}),
+      eventOption("只谈能力，不给承诺","好感-4，但不背人情债",()=>{e.fav=clamp(e.fav-4,0,100)})]}},
+  {id:"old_guard",title:"旧班底抵制新流程",body:"你要求所有宴会采购线上比价。赵崇德在会上说：『酒店开了二十多年，靠的是信任，不是每件事都拿表格算。』",opts:()=>[
+    eventOption("坚持执行","赵崇德好感-7，财务更稳",()=>{relation(S,"zhao",-7);risk(S,"finance",-12);add(S,"brand",1)}),
+    eventOption("给老供应商半年过渡期","旧班底满意，财务暗雷继续",()=>{relation(S,"zhao",6);risk(S,"finance",8)})]},
+  {id:"anonymous",title:"集团收到匿名信",cond:()=>S.track.demotions+S.track.fires>0,body:"程雪岚给你看了一封匿名信，内容说你『排除异己、任人唯亲』。没有署名，但细节明显来自酒店内部。",opts:()=>[
+    eventOption("把人事依据全部交集团","程雪岚好感+4，员工暂时紧张",()=>{relation(S,"cheng",4);add(S,"morale",-2)}),
+    eventOption("内部查是谁写的","可能震慑，也可能激化派系",()=>{if(Math.random()<.5){add(S,"morale",-5);risk(S,"labor",8)}else{relation(S,"zhao",-4);add(S,"brand",1)}})]},
+  {id:"data_leak",title:"住客名单被发进外部群",body:"销售员工为了拉客户，把一份带有姓名和电话的住客名单发进了外部合作群。虽然很快撤回，但已经有人截图。",opts:()=>[
+    eventOption("主动通知客人并整改","花8万，评分-0.03，后续更稳",()=>{add(S,"cash",-8);add(S,"rating",-.03);risk(S,"labor",-5);risk(S,"finance",-4)}),
+    eventOption("要求所有人保密","短期没事，留下隐患",()=>{risk(S,"finance",10);risk(S,"labor",5)})]},
+  {id:"safe_short",title:"前台备用金少了两万",body:"夜审发现前台保险柜少了两万元。交接班签字齐全，监控偏偏有十分钟盲区。",opts:()=>[
+    eventOption("报警并停岗调查","士气-3，财务暗雷下降",()=>{add(S,"morale",-3);risk(S,"finance",-12)}),
+    eventOption("让前厅内部补上","现金不损失，但责任没有查清",()=>{risk(S,"finance",12);relation(S,"zhao",3)})]},
+  {id:"payroll",title:"集团拨款晚了",cond:()=>S.cash<100,body:"工资发放日前一天，集团承诺的周转款还没到账。刘文静问，是先拖供应商，还是晚两天发工资。",opts:()=>[
+    eventOption("先发工资，拖供应商","士气稳定，财务关系恶化",()=>{add(S,"cash",-25);risk(S,"finance",8)}),
+    eventOption("晚两天发工资","现金缓一口气，士气-8",()=>{add(S,"cash",8);add(S,"morale",-8);risk(S,"labor",10)})]},
+  {id:"drill",title:"消防演练撞上满房",body:"罗峥建议下周做一次全员消防演练，偏偏那天预计入住率很高。",opts:()=>[
+    eventOption("照常演练","花6万，可能打扰客人，但安全更稳",()=>{add(S,"cash",-6);risk(S,"fire",-18);relation(S,"luo",5);add(S,"rating",-.02)}),
+    eventOption("推迟到淡季","罗峥好感-4，经营不受影响",()=>{relation(S,"luo",-4);risk(S,"fire",6)})]},
+  {id:"flood",title:"暴雨灌进地下机房",body:"凌晨暴雨，地下室排水泵报警。工程部说再涨十厘米，配电柜和洗衣房都会受影响。",opts:()=>[
+    eventOption("连夜请抢险队","花22万，设备损失可控",()=>{add(S,"cash",-22);risk(S,"equipment",-12);add(S,"morale",2)}),
+    eventOption("员工自己抽水","省钱，但设备和用工压力上升",()=>{risk(S,"equipment",14);risk(S,"labor",8);add(S,"morale",-3)})]},
+  {id:"heat",title:"高温天中央空调吃不消",body:"连续高温，客房空调满负荷运转。工程部建议主动降低部分楼层可售房，否则可能整机停摆。",opts:()=>[
+    eventOption("主动封闭十间房","少收入，设备风险下降",()=>{add(S,"cash",-8);risk(S,"equipment",-14)}),
+    eventOption("全部开放，旺季不能浪费","保收入，设备暗雷上升",()=>{add(S,"cash",6);risk(S,"equipment",12)})]},
+  {id:"festival",title:"黄金周突然爆满",cond:()=>monthIndex(S)===9,body:"黄金周第一天，临时客流远超预测。前台排队到旋转门，保洁电话一个接一个。",opts:()=>[
+    eventOption("临时加人并发餐券","花10万，尽量稳住体验",()=>{add(S,"cash",-10);add(S,"rating",.03);risk(S,"labor",-4)}),
+    eventOption("让各部门硬扛","现金+8万，服务和卫生承压",()=>{add(S,"cash",8);add(S,"morale",-5);risk(S,"hygiene",10);risk(S,"labor",8)})]},
+  {id:"lowseason",title:"淡季大堂空得发慌",cond:()=>[0,1,7].includes(monthIndex(S)),body:"下午三点，大堂只有鱼缸过滤器的声音。销售部建议接低价团填房，前厅却担心服务员养成低标准。",opts:()=>[
+    eventOption("接两个低价团","现金+12万，品牌-3，卫生压力上升",()=>{add(S,"cash",12);add(S,"brand",-3);risk(S,"hygiene",5)}),
+    eventOption("利用淡季集中培训","花8万，服务和士气提升",()=>{add(S,"cash",-8);S.serviceBoost+=.08;add(S,"morale",4)})]},
+  {id:"livestream",title:"年轻员工想直播卖房券",body:"孟帆拿来一套直播方案：总经理亲自出镜，两小时卖周末房券。他说隔壁酒店上个月卖了三千份。",opts:()=>[
+    eventOption("你亲自上直播","花6万，效果看销售能力",()=>{add(S,"cash",-6);if(rolePower(S,"sales")>.8){add(S,"cash",24);add(S,"brand",6)}else{add(S,"brand",-2)}}),
+    eventOption("让销售团队自己做","风险较低，品牌+2",()=>{add(S,"brand",2);S.marketBoost+=.04})]},
+  {id:"review_reply",title:"一条长差评被顶到首页",body:"客人写了八百字差评，从停车、前台到早餐逐条批评。很多细节是真的，也夹杂了夸张。",opts:()=>[
+    eventOption("总经理实名回复并整改","花5万，评分+0.04",()=>{add(S,"cash",-5);add(S,"rating",.04);add(S,"brand",2)}),
+    eventOption("交给公关写标准回复","省事，效果有限",()=>{if(Math.random()<.5)add(S,"rating",.01);else add(S,"rating",-.03)})]},
+  {id:"meeting_refund",title:"客户要求全额退会议费",body:"一场会议因为主办方自己的嘉宾缺席而取消，对方却要求酒店全额退还定金，并暗示以后还有大单。",opts:()=>[
+    eventOption("按合同扣定金","现金+8万，客户关系下降",()=>{add(S,"cash",8);relation(S,"fu",-5)}),
+    eventOption("全额退，保住未来","现金-8万，傅闻洲好感+5",()=>{add(S,"cash",-8);relation(S,"fu",5)})]},
+  {id:"smoking_vip",title:"重要客人在无烟套房抽烟",body:"一位重要接待客人在无烟套房连续抽烟，服务员提醒后反被训了一顿。房间明天还有预订。",opts:()=>[
+    eventOption("坚持规定并收清洁费","品牌+2，关系可能受损",()=>{add(S,"brand",2);relation(S,"qin",-2);add(S,"morale",3)}),
+    eventOption("不提醒，安排深度清洁","花2万，员工觉得你不撑腰",()=>{add(S,"cash",-2);add(S,"morale",-3);risk(S,"hygiene",3)})]},
+  {id:"arrears",title:"企业客户拖欠三个月账款",body:"一家协议企业已经拖欠三个月房费。销售部说催得太紧会丢客户，财务说再不催就要计提坏账。",opts:()=>[
+    eventOption("暂停挂账，正式催收","追回18万，品牌关系下降",()=>{add(S,"cash",18);relation(S,"zhou",-4);risk(S,"finance",-8)}),
+    eventOption("再宽限一个季度","企业关系+4，财务暗雷上升",()=>{relation(S,"zhou",4);risk(S,"finance",14)})]},
+  {id:"deposit",title:"婚宴定金退不退",body:"一对新人分手了，双方父母分别打电话要求退婚宴定金，还互相要求酒店不能把钱退给对方。",opts:()=>[
+    eventOption("冻结款项，等双方书面一致","稳妥，暂时占用客服精力",()=>{risk(S,"finance",-3);add(S,"morale",-1)}),
+    eventOption("看在情面上先退一方","评分可能提高，但财务风险上升",()=>{add(S,"rating",.02);risk(S,"finance",10)})]},
+  {id:"laundry",title:"外包洗衣厂提出低价方案",body:"一家新洗衣厂报价比现在低20%，还能给三个月账期。唐秋月说样品手感一般，但财务很喜欢这个价格。",opts:()=>[
+    eventOption("先试一个月","现金+6万，卫生质量存在波动",()=>{add(S,"cash",6);if(Math.random()<.55)risk(S,"hygiene",10);else risk(S,"finance",-4)}),
+    eventOption("继续用老供应商","成本高，但客房稳定",()=>{add(S,"cash",-4);risk(S,"hygiene",-5);relation(S,"tang",3)})]},
+  {id:"pest",title:"厨房后门发现蟑螂",body:"夜班员工在厨房后门拍死了一只蟑螂。照片只在内部群出现过，但下周有三场婚宴。",opts:()=>[
+    eventOption("封厨房半天全面消杀","花12万，取消一场小宴席",()=>{add(S,"cash",-12);risk(S,"hygiene",-24)}),
+    eventOption("局部喷药，别影响生意","花2万，暗雷继续",()=>{add(S,"cash",-2);risk(S,"hygiene",14)})]},
+  {id:"parking",title:"停车场入口堵死",body:"婚宴和会议同时散场，停车场出口排起长队。客人把车横在门口，后面的出租车也进不来。",opts:()=>[
+    eventOption("请交警和代驾协助","花5万，快速恢复",()=>{add(S,"cash",-5);add(S,"brand",2)}),
+    eventOption("让保安慢慢疏导","省钱，评分-0.04",()=>{add(S,"rating",-.04);risk(S,"labor",3)})]},
+  {id:"minibar",title:"迷你吧账单被质疑",body:"一名商务客坚持自己没有喝房间里的红酒。客房记录说封签已经打开，前台要求他付款。",opts:()=>[
+    eventOption("免单并检查流程","少收800元，评分+0.02",()=>{add(S,"cash",-.08);add(S,"rating",.02);risk(S,"hygiene",-2)}),
+    eventOption("按记录收费","现金不变，评分可能下降",()=>{if(Math.random()<.6)add(S,"rating",-.03)})]},
+  {id:"waste",title:"宴会剩菜被员工打包",body:"客人离场后，几名员工把未动过的宴会菜打包带走。领班说以前一直如此，人力经理认为有食品安全和管理问题。",opts:()=>[
+    eventOption("明确禁止，统一报损","士气-3，卫生更稳",()=>{add(S,"morale",-3);risk(S,"hygiene",-8)}),
+    eventOption("默认不浪费","士气+3，卫生暗雷上升",()=>{add(S,"morale",3);risk(S,"hygiene",8)})]},
+  {id:"inspection_room",title:"神秘客住进酒店",body:"前厅怀疑一位独自入住的中年客人是集团派来的神秘客。他从入住开始就在小本子上记录。",opts:()=>[
+    eventOption("通知各部门特别关照","可能被看出刻意，但服务更稳",()=>{S.serviceBoost+=.05;add(S,"morale",-1)}),
+    eventOption("保持日常，不打招呼","考验真实运营水平",()=>{const p=(rolePower(S,"front")+rolePower(S,"rooms"))/2;if(p>.85){relation(S,"shen",5);add(S,"brand",3)}else relation(S,"shen",-5)})]},
+  {id:"union",title:"员工代表要求开沟通会",body:"几名老员工联名要求和你谈排班、加班费和晋升机会。赵崇德说以前没有这种先例。",opts:()=>[
+    eventOption("公开开会，逐条回应","花1点管理精力的效果，士气+6",()=>{add(S,"morale",6);risk(S,"labor",-12);relation(S,"zhao",-3)}),
+    eventOption("让部门经理分别安抚","不公开承诺，效果有限",()=>{add(S,"morale",1);risk(S,"labor",4)})]},
+  {id:"group_audit",title:"集团审计进场",once:true,cond:()=>S.month>=14,body:"集团审计组提前一天通知进场，重点查采购、宴请、备用金和合同账期。刘文静整晚没有离开办公室。",opts:()=>[
+    eventOption("完整配合","过去的选择会决定结果",()=>{if(S.risks.finance<55){relation(S,"ma",7);add(S,"brand",3);risk(S,"finance",-10)}else if(S.risks.finance<85){add(S,"cash",-35);relation(S,"ma",-8);risk(S,"finance",-18)}else{S.flags.auditDanger=true;add(S,"cash",-60);relation(S,"shen",-12)}}),
+    eventOption("先找集团熟人打招呼","可能缓冲，也会留下新的痕迹",()=>{relation(S,"cheng",-3);risk(S,"finance",12);S.track.gray++;if(Math.random()<.45)add(S,"cash",-20)})]},
+  {id:"five_star",title:"升级五星的机会",once:true,cond:()=>S.month>=15&&S.rating>=4.25&&S.brand>=68,body:"秦书礼告诉你，明年有一批五星级酒店评定名额。雾都宾馆基础还差一些，但不是完全没机会。",opts:()=>[
+    eventOption("投入180万启动升级","设施、品牌和终局路线大幅提升",()=>{add(S,"cash",-180);S.facilities.rooms++;S.facilities.banquet++;S.facilities.safety++;add(S,"brand",10);S.flags.fiveStarBid=true},S.cash<200),
+    eventOption("先把四星守稳","不冒现金风险",()=>{relation(S,"qin",-2)})]},
+];
+
+function eventAvailable(e){return (!e.once||!S.usedEvents.includes(e.id))&&(!e.cond||e.cond())&&S.lastEvent!==e.id}
+function chooseEvent(){
+  const chained=S.chain.shift();if(chained){const e=EVENTS.find(x=>x.id===chained);if(e&&eventAvailable(e))return e}
+  const pool=EVENTS.filter(eventAvailable);return pool.length?pick(pool):null;
+}
+function riskWarning(){
+  const candidates=Object.keys(S.risks).filter(k=>S.risks[k]>=52&&(S.warningMonth[k]||0)<S.month-2);
+  if(!candidates.length)return null;
+  candidates.sort((a,b)=>S.risks[b]-S.risks[a]);
+  if(Math.random()>.48&&S.risks[candidates[0]]<72)return null;
+  return candidates[0];
+}
+function disasterCheck(){
+  const candidates=Object.keys(S.risks).filter(k=>S.risks[k]>=85&&S.warnings[k]>=2);
+  if(!candidates.length)return null;
+  candidates.sort((a,b)=>S.risks[b]-S.risks[a]);const key=candidates[0];
+  if(S.risks[key]<96&&Math.random()>.36)return null;
+  const ends={
+    fire:["火警封楼","凌晨四点，十二楼配电井起火。虽然人员最终疏散，但浓烟和消防水毁掉了三层客房。调查人员翻开一次次被推迟的整改记录，没人再问你这个月的入住率。"],
+    hygiene:["食安事故","一场婚宴后，数十名客人出现食物中毒症状。急诊大厅挤满家属，雾都宾馆的名字登上了本地热搜第一。监管封停厨房，集团当天免去了你的职务。"],
+    equipment:["设备事故","老旧电梯在运行中发生严重故障。救援结束后，整栋酒店被要求停业检查。那些交接本里反复出现的异常声音，最终都成了事故报告的附件。"],
+    labor:["员工集体停工","婚宴旺季的早晨，客房和餐饮员工集体拒绝上岗。门口拉起了写着加班费和欠休的横幅，住客拖着行李穿过人群。集团派来的工作组接管了酒店。"],
+    finance:["账本翻船","审计组从一张不连续的发票追到采购返点、账外宴请和长期挂账。你曾经认为可以以后再处理的每一笔小事，最后在一张表上连成了线。"],
+  };
+  return ends[key];
+}
+function applyPassiveRisks(s,f){
+  const eng=rolePower(s,"engineering"),rooms=rolePower(s,"rooms"),fb=rolePower(s,"fb"),admin=rolePower(s,"admin");
+  risk(s,"equipment",2.8+s.facilityAge*.5-eng*3.2+(f.occupancy>.9?3:0));
+  risk(s,"fire",1.8+s.facilityAge*.35-eng*2.3+(f.eventRevenue>45?2:0));
+  risk(s,"hygiene",2.2-rooms*1.4-fb*1.1+f.overload*8);
+  const shortage=Object.entries(s.departments).reduce((n,[k,d])=>n+Math.max(0,DEPARTMENTS[k].need-d.staff),0);
+  risk(s,"labor",1+shortage*.18+standby(s).length*.7-s.morale/55);
+  risk(s,"finance",s.cash<80?5:s.cash<0?12:-1.2);
+}
+function settleCore(s){
+  s.lastDelta={};const f=calculateForecast(s);
+  add(s,"cash",f.cashNet);s.last={occupancy:f.occupancy,adr:f.adr,revpar:f.revpar,profit:f.cashNet,revenue:f.revenue};
+  const service=(rolePower(s,"front")+rolePower(s,"rooms"))/2+s.serviceBoost;
+  let ratingDelta=(service-.78)*.065-f.overload*.12;
+  if(f.occupancy>.96)ratingDelta-=.035;
+  add(s,"rating",ratingDelta);add(s,"brand",(s.rating-3.8)*.45+(f.cashNet>0?.3:-.2));
+  const idle=standby(s).length;add(s,"morale",-1.5+Object.values(s.departments).reduce((n,d)=>n+(d.staff?0:.2),0)-idle*.65+(f.cashNet>15?.6:0));
+  applyPassiveRisks(s,f);
+  for(const n of s.npcs){if(n.fav>35&&n.lastMet<s.month)n.fav=clamp(n.fav-1,0,100)}
+  for(const c of s.competitors){c.score=clamp(c.score+c.growth+rand(-.4,.5),35,98);if(Math.random()<.035){c.score-=5;log(s,"good",`${c.name}在网上出了状况，排名分下降。`)}}
+  for(const o of s.orders.filter(x=>x.status==="accepted")){if(o.type==="婚宴")s.track.weddings++;if(["大型会议","年会","政府接待"].includes(o.type))s.track.meetings++;if(o.client)relation(s,o.client,2)}
+  s.track.profit+=f.cashNet;s.track.revenue+=f.revenue;s.track.roomNights+=f.sold;s.track.maxOcc=Math.max(s.track.maxOcc,f.occupancy);s.track.minCash=Math.min(s.track.minCash,s.cash);
+  s.marketBoost=0;s.serviceBoost=Math.max(0,s.serviceBoost-.04);s.facilityAge+=.055;
+  const promised=Object.keys(s.flags).filter(k=>k.startsWith("promise_")&&s.flags[k]===s.month);
+  for(const k of promised){const e=employeeById(s,+k.split("_")[1]);if(e){e.fav=clamp(e.fav-12,0,100);add(s,"morale",-3);log(s,"bad",`你答应${e.name}的提拔期限到了，岗位却没有动静。`)}}
+  return f;
+}
+
+function hotelScore(s){
+  const profitScore=clamp(50+(s.cash-(s.startCash||320))/12,10,95),ratingScore=clamp(s.rating*20,20,100),brand=s.brand;
+  return round(profitScore*.38+ratingScore*.34+brand*.28,1);
+}
+function myRank(s){return 1+s.competitors.filter(c=>c.score>hotelScore(s)).length}
+function endingFor(s){
+  const rank=myRank(s),profit=s.cash-(s.startCash||320);
+  if(s.flags.fiveStarBid&&s.rating>=4.45&&s.brand>=78&&profit>0)return ["五星挂牌","评审组离店那天没有表态。一个月后，红头文件送到酒店。雾都宾馆门口重新搭起脚手架，旧四星被摘下，新的五星在阳光下亮得晃眼。",true];
+  if(s.track.weddings>=10&&s.track.weddings>s.track.meetings+2&&profit>80)return ["山城婚宴王","两年里，宴会厅见证了无数对新人。梁曼把下一年的黄金档期表推到你面前，已经排到十月。同行提起雾都宾馆，第一反应不再是老，而是难订。",true];
+  if(s.track.meetings>=9&&s.last.adr>=430&&profit>70)return ["商务酒店之王","企业协议房和会展订单填满了工作日。大厅里永远有人拖着登机箱匆匆进出，雾都宾馆重新成了这座城市商务地图上的坐标。",true];
+  if(s.rating>=4.6&&s.morale>=72)return ["服务传奇","你没有把所有钱都砸在大理石上，而是花在了人和流程上。两年后，平台评论里出现最多的一句话是：这家酒店的人，真的把客人当回事。",true];
+  if(rank===1&&npcById(s,"shen").fav>=65)return ["集团晋升","董事会上，沈敬山把雾都宾馆两年的报表放到桌面正中。散会后程雪岚告诉你，集团运营副总的办公室已经收拾出来了。",true];
+  if(s.morale>=82&&s.employees.filter(e=>e.fav>=65).length>=8)return ["员工拥戴","集团给了你新的任命，但离店那天，大堂、厨房、机房和客房部的人都来了。有人说这两年很累，但至少大家知道为什么而忙。",true];
+  if(profit<0&&s.cash<80)return ["资本接盘","雾都宾馆没有倒下，但也没能真正翻身。集团最终把物业和经营权一起卖给了外地基金。新招牌挂起那天，你已经坐在另一座城市的酒店大堂里。",false];
+  if(rank<=2)return ["老店新生","没有传奇般的五星，也没有惊天动地的逆袭。可两年前那家暮气沉沉的老酒店，如今现金流稳定、客人重新回来、员工愿意留下。这个结果足够硬。",true];
+  return ["平稳守成","二十四个月结束，雾都宾馆仍站在原来的街口。成绩不算耀眼，问题也没有全部解决。沈敬山合上报表：『再给你一年，你还敢接吗？』",rank<=3];
+}
+
+function spend(n=1){S.energy=Math.max(0,S.energy-n);renderAll()}
+function needEnergy(){if(S.energy>0)return true;showModal("本月已经忙不过来了","4点行动力已经用完。调整房价和查看报表仍然可以进行，其他事情等下个月。",[{text:"知道了"}]);return false}
+function showModal(title,body,options){
+  if(typeof document==="undefined")return;
+  $("#modalTitle").textContent=title;$("#modalBody").textContent=body;const box=$("#modalOptions");box.innerHTML="";
+  options.forEach(o=>{const b=document.createElement("button");b.innerHTML=`${o.text}${o.sub?`<small>${o.sub}</small>`:""}`;b.disabled=!!o.disabled;b.onclick=()=>{$("#mask").classList.remove("show");if(o.fn)o.fn();if(!$("#mask").classList.contains("show"))flushQueue()};box.appendChild(b)});
+  $("#mask").classList.add("show");
+}
+function enqueue(fn){modalQueue.push(fn)}
+function flushQueue(){if(modalQueue.length)modalQueue.shift()();else renderAll()}
+function queueAll(arr){modalQueue.push(...arr);flushQueue()}
+
+function actMarket(){
+  if(!needEnergy())return;
+  showModal("拓展客户","这个月准备从哪里找增量？",[
+    eventOption("跑企业协议客户","花6万，商务需求提高",()=>{add(S,"cash",-6);S.marketBoost+=.09;add(S,"brand",2);spend()}),
+    eventOption("联合旅行社做周末团","花4万，入住需求提高，但客房负荷上升",()=>{add(S,"cash",-4);S.marketBoost+=.12;risk(S,"hygiene",3);relation(S,"xu",2);spend()}),
+    eventOption("做一场婚宴品鉴会","花18万，提高婚宴订单和品牌",()=>{add(S,"cash",-18);add(S,"brand",5);relation(S,"liang",3);S.flags.weddingShow=S.month+3;spend()}),
+    eventOption("先不投市场","不花行动力",()=>{})]);
+}
+function actRelation(){switchTab("relations");if(S.energy<=0)needEnergy()}
+function actTeam(){
+  if(!needEnergy())return;
+  showModal("管理团队","人事动作会改变岗位、工资、士气和派系关系。调岗本身不花行动力，招聘和集中管理要花。",[
+    eventOption("查看管理层和岗位","转到团队页面，不花行动力",()=>switchTab("team")),
+    eventOption("招聘实名管理人员","查看本月3名候选人，签约花1点行动力",()=>showCandidates()),
+    eventOption("补充基层员工","选择一个部门补2人，花8万和1点行动力",()=>showFrontlineHire(),!!S.flags.hiringFreeze&&S.flags.hiringFreeze>=S.month),
+    eventOption("发全员奖金","花35万，士气+10",()=>{add(S,"cash",-35);add(S,"morale",10);spend()},S.cash<35),
+    eventOption("取消","不花行动力",()=>{})]);
+}
+function actService(){
+  if(!needEnergy())return;
+  showModal("抓服务","这个月重点盯哪一块？",[
+    eventOption("总经理带队查房","花5万，评分和客房稳定性提升",()=>{add(S,"cash",-5);S.serviceBoost+=.09;risk(S,"hygiene",-9);add(S,"rating",.03);spend()}),
+    eventOption("投诉复盘培训","花10万，评分+0.05，士气+2",()=>{add(S,"cash",-10);add(S,"rating",.05);add(S,"morale",2);S.serviceBoost+=.05;spend()}),
+    eventOption("宴会服务演练","花8万，餐饮负荷能力提升",()=>{add(S,"cash",-8);S.serviceBoost+=.07;risk(S,"labor",-4);spend()}),
+    eventOption("取消","不花行动力",()=>{})]);
+}
+function actFacility(){
+  if(!needEnergy())return;
+  showModal("修缮设施","老酒店最怕把『还能用』当成『没问题』。",[
+    eventOption("全面例行检修","花24万，多个隐患得到缓解",()=>{add(S,"cash",-24);Object.keys(S.risks).forEach(k=>risk(S,k,k==="labor"||k==="finance"?-3:-9));S.track.repairs++;spend()},S.cash<24),
+    eventOption("重点检修消防","花18万",()=>{add(S,"cash",-18);risk(S,"fire",-24);relation(S,"luo",2);S.track.repairs++;spend()},S.cash<18),
+    eventOption("重点检修机电设备","花28万",()=>{add(S,"cash",-28);risk(S,"equipment",-28);S.facilityAge=Math.max(0,S.facilityAge-.35);S.track.repairs++;spend()},S.cash<28),
+    eventOption("客房翻新一层","花120万，品牌+6，基础房价能力提高",()=>{add(S,"cash",-120);S.facilities.rooms++;S.facilityAge=Math.max(0,S.facilityAge-.5);add(S,"brand",6);spend()},S.cash<140),
+    eventOption("取消","不花行动力",()=>{})]);
+}
+function actPromotion(){
+  if(!needEnergy())return;
+  showModal("营销推广","推广能填房，也可能拉低价格和服务质量。",[
+    eventOption("OTA首页推广","花12万，下月需求+15%，平台占比提高",()=>{add(S,"cash",-12);S.marketBoost+=.15;S.otaShare=clamp(S.otaShare+.08,.2,.8);relation(S,"su",2);spend()}),
+    eventOption("本地品牌广告","花22万，品牌+7，需求小幅提高",()=>{add(S,"cash",-22);add(S,"brand",7);S.marketBoost+=.05;spend()}),
+    eventOption("会员房券预售","现金+35万，未来服务与财务压力上升",()=>{add(S,"cash",35);S.marketBoost+=.08;risk(S,"finance",8);risk(S,"labor",3);spend()}),
+    eventOption("取消","不花行动力",()=>{})]);
+}
+function showCandidates(){
+  showModal("本月管理人才",`签约后先进入待岗。待岗照发工资，也会影响士气；有空缺时再安排岗位。`,S.candidates.map(c=>eventOption(`${c.name} · ${DEPARTMENTS[c.dept].name}`,`专业${c.skill} 管理${c.manage} 忠诚${c.loyalty} · 月薪${c.salary}万 · ${c.trait}`,()=>{
+    c.id=S.empSeq++;S.employees.push(c);S.candidates=S.candidates.filter(x=>x!==c);S.track.hires++;log(S,"good",`${c.name}签约入职，目前处于待岗状态。`);spend();
+  })).concat([eventOption("都不合适","不花行动力",()=>{})]));
+}
+function showFrontlineHire(){
+  showModal("补充基层员工","选择部门补充2名基层员工。以后每月都会增加工资。",Object.keys(DEPARTMENTS).map(id=>eventOption(DEPARTMENTS[id].name,`当前${S.departments[id].staff}/${DEPARTMENTS[id].need}人 · 花8万`,()=>{add(S,"cash",-8);S.departments[id].staff+=2;add(S,"morale",2);spend()})).concat([eventOption("取消","不花行动力",()=>{})]));
+}
+function interactNpc(id,method){
+  if(!needEnergy())return;const n=npcById(S,id);if(n.lastMet===S.month){showModal("本月已经见过",`${n.name}这个月已经见过，再去只会显得没有分寸。`,[{text:"知道了"}]);return}
+  const costs={report:0,dinner:5,help:12};if(S.cash<costs[method]){showModal("现金不够","这次安排需要更多现金。",[{text:"知道了"}]);return}
+  let delta=method===n.pref?8:method===n.avoid?-4:4;
+  if(n.lastMethod===method){n.repeat=(n.repeat||0)+1;delta=Math.max(1,delta-n.repeat*2)}else n.repeat=0;
+  n.lastMethod=method;n.lastMet=S.month;n.tried[method]=delta;add(S,"cash",-costs[method]);relation(S,id,delta);S.track.relations++;
+  if(method==="help"&&["qin","luo","ma","shen"].includes(id)){risk(S,"finance",5);S.track.gray++}
+  const scene=delta>=7?"这次你说到了对方心里，谈话结束时，对方主动提到了下一步合作。":delta<0?"对方礼貌地把话题岔开。你意识到，这种方式在他这里并不受用。":"事情谈得不坏，但还远不到可以开口提要求的时候。";
+  log(S,delta>0?"good":"bad",`${n.name}好感${delta>=0?"+":""}${delta}。`);spend();showModal(`${n.name} · ${method==="report"?"正式拜访":method==="dinner"?"私下用餐":"帮忙办事"}`,`${scene}\n\n好感${delta>=0?"+":""}${delta}${costs[method]?`，花${costs[method]}万`:""}。`,[{text:"告辞"}]);
+}
+function assignEmployee(empId,postId){
+  const e=employeeById(S,empId),p=POST_MAP[postId];if(!e||!p||!vacancy(S,postId))return;
+  const current=postOf(e);if(current&&current.rank>=p.rank)return;
+  if(p.rank<=2&&p.dept!==e.dept){showModal("专业不匹配",`${e.name}的专业经历不适合直接进入${p.name}。`,[{text:"知道了"}]);return}
+  e.post=postId;e.salary=round(e.salary+(p.rank===1?.15:p.rank===2?.45:.75),1);e.fav=clamp(e.fav+6,0,100);add(S,"morale",2);log(S,"good",`${e.name}被安排为${p.name}。`);renderAll();
+}
+function promoteEmployee(empId,fromEvent=false){
+  const e=employeeById(S,empId),p=postOf(e);if(!e||!p)return;
+  let targets=[];
+  if(p.rank===1&&vacancy(S,`mgr_${e.dept}`))targets=[`mgr_${e.dept}`];
+  if(p.rank===2)targets=["vp_ops","vp_business"].filter(id=>vacancy(S,id));
+  if(!targets.length){if(fromEvent){e.fav=clamp(e.fav-4,0,100);log(S,"bad",`${e.name}想要的位置没有空缺。`);renderAll();return}showModal("没有上级空缺","必须先降职、调离或解聘占岗人员，腾出上级编制后才能提拔。",[{text:"知道了"}]);return}
+  showModal(`提拔 ${e.name}`,"选择一个空缺的上级岗位。提拔会增加工资，也会影响其他员工对晋升秩序的判断。",targets.map(id=>eventOption(POST_MAP[id].name,`月薪增加，士气+3`,()=>{e.post=id;e.salary=round(e.salary+.65,1);e.fav=clamp(e.fav+10,0,100);add(S,"morale",3);S.track.promotions++;delete S.flags[`promise_${e.id}`];log(S,"good",`${e.name}被提拔为${POST_MAP[id].name}。`);renderAll()})));
+}
+function demoteEmployee(empId){
+  const e=employeeById(S,empId),p=postOf(e);if(!e||!p)return;
+  let target=null;if(p.rank===3){const own=`mgr_${e.dept}`;if(POST_MAP[own]&&vacancy(S,own))target=own}else if(p.rank===2){const own=`sup_${e.dept}`;if(vacancy(S,own))target=own}
+  const dest=target?POST_MAP[target].name:"待岗";
+  showModal(`降职 ${e.name}`,`确认将${e.name}从${p.name}降为${dest}？原岗位会立刻空出。本人好感和全店士气都会下降。`,[
+    eventOption("确认降职",`好感-18，士气-5${target?"":"，进入待岗"}`,()=>{e.post=target;e.fav=clamp(e.fav-18,0,100);e.salary=Math.max(.8,round(e.salary-.35,1));add(S,"morale",-5);risk(S,"labor",7);S.track.demotions++;log(S,"bad",`${e.name}被降为${dest}。`);renderAll()}),eventOption("取消","",()=>{})]);
+}
+function dismissEmployee(empId){
+  const e=employeeById(S,empId);if(!e)return;const p=postOf(e);
+  showModal(`解聘 ${e.name}`,`确认让${e.name}离开雾都宾馆？${p?`${p.name}将出现空缺。`:"待岗工资会停止。"}`,[
+    eventOption("确认解聘","士气-6，用工暗雷上升",()=>{S.employees=S.employees.filter(x=>x.id!==empId);add(S,"morale",-6);risk(S,"labor",10);S.track.fires++;log(S,"bad",`${e.name}离开了酒店。`);renderAll()}),eventOption("取消","",()=>{})]);
+}
+function chooseAssignment(empId){
+  const e=employeeById(S,empId);if(!e)return;
+  const targets=POSTS.filter(p=>vacancy(S,p.id)&&((p.rank<=2&&p.dept===e.dept)||(p.rank===3&&e.manage>=3)));
+  if(!targets.length){showModal("没有合适空缺","当前没有与此人专业和资历相符的空缺岗位。",[{text:"知道了"}]);return}
+  showModal(`安排 ${e.name} 上岗`,"选择一个空缺岗位。跨越层级的直接任命会引起额外议论。",targets.map(p=>eventOption(p.name,`岗位等级${p.rank}`,()=>assignEmployee(empId,p.id))));
+}
+function acceptOrder(id){const o=S.orders.find(x=>x.id===id);if(!o||o.status!=="open")return;o.status="accepted";if(o.ota)S.otaShare=clamp(S.otaShare+.08,.2,.8);log(S,"good",`已接受订单：${o.title}。`);renderAll()}
+function rejectOrder(id){const o=S.orders.find(x=>x.id===id);if(!o||o.status!=="open")return;o.status="rejected";if(o.client)relation(S,o.client,-1);log(S,"",`放弃订单：${o.title}。`);renderAll()}
+function negotiateOrder(id){
+  if(!needEnergy())return;const o=S.orders.find(x=>x.id===id);if(!o||o.status!=="open")return;
+  const sales=rolePower(S,"sales"),chance=.35+sales*.42;spend();
+  if(Math.random()<chance){o.roomRevenue=round(o.roomRevenue*1.12,1);o.eventRevenue=round(o.eventRevenue*1.1,1);o.fbRevenue=round(o.fbRevenue*1.08,1);o.status="accepted";if(o.client)relation(S,o.client,3);showModal("谈成了",`销售团队把价格和账期都往回谈了一步。订单已接受，预计收入提高。`,[{text:"漂亮"}])}
+  else{if(Math.random()<.45){o.status="rejected";showModal("谈崩了","对方转身去了竞争酒店。订单已经失去。",[{text:"认了"}])}else{o.status="accepted";o.delayed=round(o.delayed+2,1);showModal("勉强谈成","价格没抬起来，对方还把账期拖长了。订单已接受。",[{text:"先做下来"}])}}
+}
+function adjustPrice(key,dir){const r=ROOM_TYPES[key];S.prices[key]=clamp(S.prices[key]+r.step*dir,r.min,r.max);renderAll()}
+
+function endMonth(){
+  if(S.over)return;if(S.energy>0){showModal("还有行动力",`本月还剩${S.energy}点行动力，确定直接结算？`,[eventOption("直接结算","剩余行动力作废",()=>doEndMonth()),eventOption("回去再看看","",()=>{})]);return}doEndMonth();
+}
+function doEndMonth(){
+  const f=settleCore(S);const tasks=[];
+  tasks.push(()=>showReport(f));
+  const disaster=disasterCheck();if(disaster){tasks.push(()=>showEnd(disaster[0],disaster[1],false));queueAll(tasks);return}
+  const warning=riskWarning();
+  if(warning){const w=RISK_WARNINGS[warning];S.warningMonth[warning]=S.month;S.warnings[warning]++;
+    tasks.push(()=>showModal(w.title,w.body,[eventOption(w.fix,`花${w.fixCost}万`,()=>{add(S,"cash",-w.fixCost);risk(S,warning,w.fixDelta);S.track.repairs++;log(S,"good",`${RISK_NAMES[warning]}方面做了一次针对性整改。`)},S.cash<w.fixCost),eventOption(w.ignore,"暂时不影响经营",()=>{risk(S,warning,w.ignoreDelta);log(S,"bad",`${w.title}的问题被暂时搁置。`)})]));
+  }else{const e=chooseEvent();if(e){S.lastEvent=e.id;if(e.once)S.usedEvents.push(e.id);tasks.push(()=>showModal(`事件 · ${e.title}`,e.body,e.opts()))}}
+  if(S.month%3===0)tasks.push(()=>quarterReview());
+  if(S.flags.starTeam&&S.month>=11&&!S.flags.starDone)tasks.push(()=>starResult());
+  if(S.flags.auditDanger&&S.risks.finance>=92)tasks.push(()=>showEnd("审计风暴","审计组没有离开。他们从异常合同继续追查，最终把采购返点和账外接待串在了一起。集团在通报发出前免去了你的职务。",false));
+  if(S.cash<-80)tasks.push(()=>showEnd("资金链断裂","供应商停止送货，工资也已经拖欠。旋转门还在转，但酒店实际上已经停摆。集团工作组进驻后，你交出了总经理办公室的钥匙。",false));
+  else if(S.morale<=8)tasks.push(()=>showEnd("人心散尽","前厅、客房和餐饮连续出现集体请假。酒店还有房、有宴会厅，却已经没有足够的人让它正常运转。",false));
+  if(S.month>=24)tasks.push(()=>{const e=endingFor(S);showEnd(e[0],e[1],e[2])});
+  else tasks.push(()=>nextMonth());
+  queueAll(tasks);
+}
+function showReport(f){
+  $("#modalTitle").textContent=`第${S.month}月 · 经营结算`;const body=$("#modalBody");body.innerHTML="";
+  const rows=[["客房收入",`+${round(f.roomRevenue,1)}万`],["餐饮收入",`+${round(f.fbRevenue,1)}万`],["会议婚宴",`+${round(f.eventRevenue,1)}万`],["工资社保",`-${f.payroll}万`],["水电能耗",`-${round(f.utilities,1)}万`],["食材采购",`-${round(f.procurement,1)}万`],["平台佣金",`-${round(f.ota,1)}万`],["维修及贷款",`-${round(f.maintenance+f.debt,1)}万`]];
+  if(f.overtime>.05)rows.push(["超负荷临时用工",`-${round(f.overtime,1)}万`]);
+  rows.forEach(([k,v])=>{const d=document.createElement("div");d.className="report-line";d.innerHTML=`<span>${k}</span><span class="${v[0]==="+"?"up":"down"}">${v}</span>`;body.appendChild(d)});
+  const sum=document.createElement("div");sum.className="report-line";sum.innerHTML=`<span><b>入住率 ${Math.round(f.occupancy*100)}% · ADR ¥${Math.round(f.adr)}</b></span><span class="${f.cashNet>=0?"up":"down"}">${f.cashNet>=0?"+":""}${round(f.cashNet,1)}万</span>`;body.appendChild(sum);
+  const box=$("#modalOptions");box.innerHTML="";const b=document.createElement("button");b.textContent="下一步";b.onclick=()=>{$("#mask").classList.remove("show");flushQueue()};box.appendChild(b);$("#mask").classList.add("show");
+}
+function quarterReview(){
+  const rank=myRank(S),score=hotelScore(S),shen=npcById(S,"shen");let text=`集团季度经营会，雾都宾馆综合得分${score}，五家酒店中排名第${rank}。\n\n`;
+  if(rank===1)text+="沈敬山把你的报表留在手边：『雾都这季度，做得像一家正常酒店了。』";
+  else if(rank<=3)text+="沈敬山没有批评，只问了一句：『现金流和评分，下一季度能不能再往上？』";
+  else text+="会议室安静了几秒。沈敬山敲了敲桌面：『老酒店不是理由。下季度我要看到变化。』";
+  if(shen.fav>=60){add(S,"cash",25);text+="\n\n会后，集团额外批了25万专项预算。"}
+  showModal(`第${Math.ceil(S.month/3)}季度考核`,text,[{text:"继续"}]);
+}
+function starResult(){
+  S.flags.starDone=true;const safe=Math.max(...Object.values(S.risks))<75;const pass=S.rating>=4.15&&S.brand>=60&&safe;
+  if(pass){add(S,"brand",8);relation(S,"qin",6);showModal("四星级复核通过","检查组没有挑出致命问题。一个月后，四星级复核通过的通知正式送达。雾都宾馆保住了招牌。",[{text:"守住了"}])}
+  else{add(S,"brand",-8);add(S,"rating",-.08);showModal("限期整改","复核没有直接摘牌，但检查组开出了长长的整改清单。雾都宾馆被要求半年内重新接受检查。",[{text:"整改"}])}
+}
+function nextMonth(){
+  S.month++;S.energy=4;S.orders=generateOrders(S);S.candidates=makeCandidates(S);log(S,"month",`—— 第${S.month}月 · ${seasonOf(S).name} ——`);flushQueue();
+}
+function showEnd(title,story,good){
+  S.over=true;S.endData={title,story,good};save();modalQueue=[];$("#mask").classList.remove("show");
+  const badges=[];if(S.rating>=4.5)badges.push("金牌口碑");if(S.morale>=75)badges.push("员工拥戴");if(S.track.weddings>=8)badges.push("婚宴红人");if(S.track.meetings>=8)badges.push("会展专家");if(S.track.gray===0)badges.push("账目清白");if(S.track.repairs>=8)badges.push("老店医生");if(myRank(S)===1)badges.push("全城第一");if(standby(S).length===0)badges.push("人尽其才");if(!badges.length)badges.push("撑完全程");
+  const grid=[["任期净现金",`${round(S.cash-(S.startCash||320),0)}万`],["累计营收",`${round(S.track.revenue,0)}万`],["最终评分",S.rating.toFixed(2)],["最高入住率",`${Math.round(S.track.maxOcc*100)}%`],["最终排名",`第${myRank(S)}名`],["管理层",`${S.employees.length}人`]];
+  $("#endCard").innerHTML=`<div class="eyebrow">《雾都宾馆》任期结算 · 总经理 ${escapeHtml(S.playerName)}</div><h2>${good?"▣":"□"} ${title}</h2><div class="story">${escapeHtml(story)}</div><div class="metric-grid">${grid.map(([k,v])=>`<div class="metric"><div class="v">${v}</div><div class="k">${k}</div></div>`).join("")}</div><div class="badges">${badges.map(b=>`<span class="badge">${b}</span>`).join("")}</div><button class="primary" style="width:100%;margin-top:10px" onclick="restartGame()">再接一次这家店</button>`;
+  $("#ending").classList.add("show");
+}
+function escapeHtml(v){return String(v).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+
+const STAT_DEFS=[
+  {key:"cash",name:"现金",unit:"万",get:s=>Math.round(s.cash),tip:"支付工资、采购、维修和营销。低于0会不断引发供应商和工资问题。"},
+  {key:"occ",name:"入住率",unit:"",get:s=>`${Math.round(s.last.occupancy*100)}%`,tip:"已售间夜 ÷ 可售间夜。高入住率会增加收入，也会放大服务和卫生压力。"},
+  {key:"adr",name:"平均房价",unit:"",get:s=>`¥${Math.round(s.last.adr)}`,tip:"ADR：每间已售客房的平均价格。低价填房不等于赚钱。"},
+  {key:"rating",name:"网络评分",unit:"",get:s=>s.rating.toFixed(2),tip:"影响散客需求和星级复核。服务能力不足、满房超载和投诉都会拉低评分。"},
+  {key:"morale",name:"员工士气",unit:"",get:s=>Math.round(s.morale),tip:"影响所有部门的承载能力。待岗、缺员、降职和长期加班都会消耗士气。"},
+  {key:"rank",name:"综合排名",unit:"/5",get:s=>myRank(s),tip:"综合利润、评分和品牌计算。决定集团考核语气，但最终结局不只看排名。"},
+];
+function renderStats(){
+  const el=$("#stats");el.innerHTML="";for(const d of STAT_DEFS){const div=document.createElement("div");div.className="stat";const delta=S.lastDelta[d.key]||0;div.innerHTML=`<div class="label">${d.name}</div><div class="value">${d.get(S)}<small>${d.unit}</small></div><div class="delta ${delta>0?"up":delta<0?"down":""}">${delta?(delta>0?"+":"")+round(delta,d.key==="rating"?2:0):""}</div><div class="tip">${d.tip}</div>`;div.onclick=e=>{const was=div.classList.contains("tip-on");document.querySelectorAll(".stat.tip-on").forEach(x=>x.classList.remove("tip-on"));if(!was)div.classList.add("tip-on");e.stopPropagation()};el.appendChild(div)}
+}
+function renderForecast(){
+  const f=calculateForecast(S),accepted=S.orders.filter(o=>o.status==="accepted").length;$("#forecast").innerHTML=`<span>${f.season.name}</span><span>预计入住 <b>${Math.round(f.occupancy*100)}%</b></span><span>RevPAR <b>¥${Math.round(f.revpar)}</b></span><span>营收 <b>+${Math.round(f.revenue)}万</b></span><span>成本 <b>-${Math.round(f.expense)}万</b></span><span>现金净 <b class="${f.cashNet>=0?"up":"down"}">${f.cashNet>=0?"+":""}${Math.round(f.cashNet)}万</b></span>${accepted?`<span>已接 <b>${accepted}</b> 单</span>`:""}${f.overload>.08?`<span class="warning">服务负荷偏高</span>`:""}`;
+}
+function renderPricing(){
+  const el=$("#pricing");el.innerHTML=`<div class="section-head"><h2>本月房价</h2><span>调整不消耗行动力</span></div><div class="price-grid">${Object.entries(ROOM_TYPES).map(([key,r])=>`<div class="price-row"><div><div class="name">${r.name} · ${r.count}间</div><div class="price">¥${S.prices[key]}</div></div><div class="stepper"><button onclick="adjustPrice('${key}',-1)" title="降价" aria-label="${r.name}降价">−</button><button onclick="adjustPrice('${key}',1)" title="涨价" aria-label="${r.name}涨价">+</button></div></div>`).join("")}</div>`;
+}
+const ACTIONS=[
+  {glyph:"▥",name:"拓客户",desc:"协议/团队/婚宴",fn:actMarket},{glyph:"◉",name:"走关系",desc:"12位关键人物",fn:actRelation},
+  {glyph:"♟",name:"管团队",desc:"岗位/招聘/基层",fn:actTeam},{glyph:"★",name:"抓服务",desc:"查房/培训/投诉",fn:actService},
+  {glyph:"⚒",name:"修设施",desc:"检修/翻新",fn:actFacility},{glyph:"⌁",name:"做推广",desc:"平台/广告/房券",fn:actPromotion},
+];
+function renderActions(){const el=$("#actions");el.innerHTML="";ACTIONS.forEach(a=>{const d=document.createElement("div");d.className=`action${S.energy<=0?" off":""}`;d.innerHTML=`<div class="glyph">${a.glyph}</div><div class="name">${a.name}</div><div class="desc">${a.desc}</div>`;d.onclick=a.fn;el.appendChild(d)})}
+function renderOperate(){
+  const f=calculateForecast(S),deptRows=Object.entries(DEPARTMENTS).map(([id,d])=>{const p=rolePower(S,id),level=p>=.95?"运转顺畅":p>=.72?"勉强够用":"明显吃紧";return `<div class="card"><div class="row"><div><h3>${d.name}</h3><span class="pill ${p>=.95?"green":p<.72?"red":"gold"}">${level}</span></div><div class="number">基层 <b>${S.departments[id].staff}/${d.need}</b></div></div><div class="copy">经理：${managerFor(S,id)?.name||"空缺"} · 主管：${supervisorFor(S,id)?.name||"空缺"}</div><div class="progress"><i style="width:${Math.min(100,p*85)}%;background:${p<.72?"var(--red)":p>=.95?"var(--green)":"var(--blue)"}"></i></div></div>`}).join("");
+  $("#panel").innerHTML=`<div class="metric-grid"><div class="metric"><div class="v">¥${Math.round(f.revpar)}</div><div class="k">预计RevPAR</div></div><div class="metric"><div class="v">${Math.round(f.revenue)}万</div><div class="k">预计总营收</div></div><div class="metric"><div class="v ${f.cashNet>=0?"up":"down"}">${f.cashNet>=0?"+":""}${Math.round(f.cashNet)}万</div><div class="k">预计现金净额</div></div></div><table class="room-table"><tr><th>房型</th><th>房量</th><th>定价</th><th>预计入住</th><th>预计收入</th></tr>${f.roomRows.map(r=>`<tr><td>${r.name}</td><td>${r.count}</td><td>¥${r.price}</td><td>${Math.round(r.occ*100)}%</td><td>${round(r.revenue,1)}万</td></tr>`).join("")}</table><div style="height:9px"></div>${deptRows}`;
+}
+function renderOrders(){
+  const f=calculateForecast(S);$("#panel").innerHTML=`<div class="section-head"><h2>本月订单池</h2><span>接受订单不花行动力，谈判花1点</span></div><div class="forecast"><span>接单后预计入住 <b>${Math.round(f.occupancy*100)}%</b></span><span>宴会会议收入 <b>${Math.round(f.eventRevenue)}万</b></span>${f.overload>.08?'<span class="warning">当前组合可能超载</span>':""}</div>${S.orders.map(o=>`<div class="card order-card ${o.status}"><div class="row"><div><span class="order-type">${o.type}</span><h3 style="display:block">${o.title}</h3></div><span class="pill ${o.status==="accepted"?"green":o.status==="rejected"?"red":"blue"}">${o.status==="accepted"?"已接受":o.status==="rejected"?"已放弃":"待决定"}</span></div><div class="copy">${o.desc}</div><div class="copy">间夜 ${o.roomNights||0} · 客房${round(o.roomRevenue||0,1)}万 · 餐饮会议${round((o.fbRevenue||0)+(o.eventRevenue||0),1)}万${o.delayed?` · 延后回款${o.delayed}万`:""}</div>${o.status==="open"?`<div class="card-actions"><button class="small" onclick="acceptOrder('${o.id}')">接受</button><button class="small" onclick="negotiateOrder('${o.id}')">谈条件</button><button class="small" onclick="rejectOrder('${o.id}')">放弃</button></div>`:""}</div>`).join("")}`;
+}
+function renderTeam(){
+  const filters=["all",...Object.keys(DEPARTMENTS),"standby","vacancy"];const labels={all:"全部",standby:"待岗",vacancy:"空缺",...Object.fromEntries(Object.entries(DEPARTMENTS).map(([k,d])=>[k,d.short]))};
+  let html=`<div class="subnav">${filters.map(k=>`<button class="${S.teamFilter===k?"on":""}" onclick="setTeamFilter('${k}')">${labels[k]}</button>`).join("")}</div><div class="forecast"><span>实名管理层 <b>${S.employees.length}</b>人</span><span>待岗 <b class="${standby(S).length?"down":"up"}">${standby(S).length}</b>人</span><span>基层 <b>${totalFrontline(S)}</b>人</span><span>月工资 <b>${totalPayroll(S)}万</b></span></div>`;
+  if(S.teamFilter==="vacancy"){
+    const v=POSTS.filter(p=>vacancy(S,p.id));html+=v.length?v.map(p=>`<div class="card vacancy"><div class="row"><div><h3>${p.name}</h3><span class="pill red">空缺</span></div><span class="meta">编制等级 ${p.rank}</span></div><div class="copy">需要从合适的下级岗位提拔，或安排一名符合专业要求的待岗人员。</div></div>`).join(""):`<div class="empty-state">当前没有空缺岗位</div>`;
+  }else{
+    const list=S.employees.filter(e=>S.teamFilter==="all"||(S.teamFilter==="standby"&&!e.post)||e.dept===S.teamFilter);
+    html+=list.length?list.map(e=>{const p=postOf(e);return `<div class="card"><div class="person-head"><div class="avatar">${e.name.slice(-1)}</div><div class="person-main"><div class="row"><div><h3>${e.name}</h3><span class="pill ${p?"blue":"red"}">${p?p.name:"待岗"}</span><span class="pill">${e.faction}</span></div><div class="number">月薪 <b>${e.salary}万</b></div></div><div class="attrs"><span class="attr">专业 ${e.skill}</span><span class="attr">管理 ${e.manage}</span><span class="attr">忠诚 ${e.loyalty}</span><span class="attr">好感 ${e.fav}</span></div><div class="copy">${e.trait}</div><div class="card-actions">${!p?`<button class="small" onclick="chooseAssignment(${e.id})">安排上岗</button>`:""}${p&&p.rank<3?`<button class="small" onclick="promoteEmployee(${e.id})">提拔</button>`:""}${p?`<button class="small" onclick="demoteEmployee(${e.id})">降职</button>`:""}<button class="small danger" onclick="dismissEmployee(${e.id})">解聘</button></div></div></div></div>`}).join(""):`<div class="empty-state">这个分类里没有员工</div>`;
+  }
+  $("#panel").innerHTML=html;
+}
+function renderRelations(){
+  const filters=["all","集团","外部","渠道","客户","内部"];let html=`<div class="subnav">${filters.map(k=>`<button class="${S.relationFilter===k?"on":""}" onclick="setRelationFilter('${k}')">${k==="all"?"全部":k}</button>`).join("")}</div><div class="forecast"><span>同一种方式反复使用，效果会递减</span><span>每人每月只能见一次</span></div>`;
+  const mark=v=>v===undefined?"":v>=7?" ✓":v<0?" ×":" ·";
+  html+=S.npcs.filter(n=>S.relationFilter==="all"||n.group===S.relationFilter).map(n=>`<div class="card"><div class="person-head"><div class="avatar">${n.name.slice(-1)}</div><div class="person-main"><div class="row"><div><h3>${n.name}</h3><span class="pill">${n.group}</span></div><div class="number">好感 <b>${n.fav}</b></div></div><div class="meta">${n.title}</div><div class="progress"><i style="width:${n.fav}%;background:${n.fav>=60?"var(--green)":"var(--blue)"}"></i></div><div class="copy">${n.hint}</div><div class="copy ${n.fav>=60?"up":""}">${n.fav>=60?"已建立稳定关系：":"好感60解锁："}${n.perk}</div><div class="card-actions"><button class="small" ${n.lastMet===S.month||S.energy<=0?"disabled":""} onclick="interactNpc('${n.id}','report')">正式拜访${mark(n.tried.report)}</button><button class="small" ${n.lastMet===S.month||S.energy<=0?"disabled":""} onclick="interactNpc('${n.id}','dinner')">私下用餐 5万${mark(n.tried.dinner)}</button><button class="small" ${n.lastMet===S.month||S.energy<=0?"disabled":""} onclick="interactNpc('${n.id}','help')">帮忙办事 12万${mark(n.tried.help)}</button></div></div></div></div>`).join("");$("#panel").innerHTML=html;
+}
+function renderRank(){
+  const rows=S.competitors.map(c=>({name:c.name,manager:c.manager,style:c.style,score:c.score,adr:c.adr,me:false}));rows.push({name:"雾都宾馆",manager:S.playerName,style:"看你的",score:hotelScore(S),adr:S.last.adr,me:true});rows.sort((a,b)=>b.score-a.score);
+  $("#panel").innerHTML=`<table class="rank-table"><tr><th>#</th><th>酒店</th><th>负责人</th><th>路线</th><th>综合分</th></tr>${rows.map((r,i)=>`<tr class="${r.me?"me":""}"><td>${i+1}</td><td>${escapeHtml(r.name)}</td><td>${escapeHtml(r.manager)}</td><td>${r.style}</td><td>${round(r.score,1)}</td></tr>`).join("")}</table><div class="copy" style="margin-top:8px">综合分由累计利润、网络评分和品牌共同构成。竞争酒店会成长，也可能因自己的经营路线爆雷。</div>`;
+}
+function renderLog(){$("#panel").innerHTML=`<div class="log">${S.log.map(l=>`<p class="${l.cls||""}">${l.text}</p>`).join("")}</div>`}
+function renderPanel(){if(S.tab==="operate")renderOperate();if(S.tab==="orders")renderOrders();if(S.tab==="team")renderTeam();if(S.tab==="relations")renderRelations();if(S.tab==="rank")renderRank();if(S.tab==="log")renderLog()}
+function switchTab(tab){S.tab=tab;document.querySelectorAll("#tabs button").forEach(b=>b.classList.toggle("on",b.dataset.tab===tab));renderPanel();save()}
+function setTeamFilter(v){S.teamFilter=v;renderTeam()}
+function setRelationFilter(v){S.relationFilter=v;renderRelations()}
+function renderAll(){if(typeof document==="undefined")return;$("#monthText").textContent=S.month;$("#leftText").textContent=Math.max(0,25-S.month);$("#energyDots").textContent="●".repeat(S.energy)+"○".repeat(4-S.energy);renderStats();renderForecast();renderPricing();renderActions();document.querySelectorAll("#tabs button").forEach(b=>b.classList.toggle("on",b.dataset.tab===S.tab));renderPanel();save()}
+function save(){if(!S)return;try{localStorage.setItem(SAVE_KEY,JSON.stringify(S))}catch(e){}}
+function load(){try{const raw=localStorage.getItem(SAVE_KEY);if(!raw)return false;const data=JSON.parse(raw);if(data.version!==SAVE_VERSION)return false;S=data;return true}catch(e){return false}}
+function askName(){
+  $("#modalTitle").textContent="集团任命";$("#modalBody").innerHTML=`程雪岚把任命文件推到你面前：『雾都宾馆交给你，两年。先在这里签字。』<br><br><input id="nameInput" maxlength="8" placeholder="写下你的名字">`;const box=$("#modalOptions");box.innerHTML="";const b=document.createElement("button");b.className="primary";b.textContent="签字上任";b.onclick=()=>{S.playerName=$("#nameInput").value.trim()||"无名总经理";$("#mask").classList.remove("show");showIntro()};box.appendChild(b);$("#mask").classList.add("show");setTimeout(()=>$("#nameInput")?.focus(),50);
+}
+function showIntro(){showModal("空降第一天",`雾都宾馆，126间客房，两座宴会厅，四个会议室。\n\n你能看到现金、入住率、房价、评分、士气和排名；看不到的东西更多。老设备不会自己开口，员工的不满也不会变成数字挂在墙上。\n\n每月4点行动力。先定房价，再决定接哪些订单、见哪些人、把钱和时间花在哪里。月底，酒店会把答案写进账单和评论里。`,[{text:"开门营业"}])}
+function restartGame(){try{localStorage.removeItem(SAVE_KEY)}catch(e){}S=initialState();$("#ending").classList.remove("show");renderAll();askName()}
+function requestRestart(){showModal("重新开始",`确定放弃当前第${S.month}月的进度，重新接手雾都宾馆？`,[eventOption("确认重开","当前存档会被覆盖",()=>restartGame()),eventOption("取消","",()=>{})])}
+function init(){
+  if(!load()){S=initialState();renderAll();askName()}else{renderAll();if(S.over&&S.endData)setTimeout(()=>showEnd(S.endData.title,S.endData.story,S.endData.good),0)}
+  $("#endMonthBtn").onclick=endMonth;$("#resetBtn").onclick=requestRestart;document.querySelectorAll("#tabs button").forEach(b=>b.onclick=()=>switchTab(b.dataset.tab));document.addEventListener("click",()=>document.querySelectorAll(".stat.tip-on").forEach(x=>x.classList.remove("tip-on")));
+}
+
+const API={initialState,calculateForecast,settleCore,hotelScore,myRank,endingFor,getEventCount:()=>EVENTS.length,getRiskWarningCount:()=>Object.keys(RISK_WARNINGS).length,setState:s=>S=s,getState:()=>S};
+if(typeof window!=="undefined")window.HotelGame=API;else globalThis.HotelGame=API;
+Object.assign(globalThis,{adjustPrice,acceptOrder,rejectOrder,negotiateOrder,interactNpc,chooseAssignment,promoteEmployee,demoteEmployee,dismissEmployee,setTeamFilter,setRelationFilter,restartGame});
+if(typeof document!=="undefined")init();
+</script>
+</body>
+</html>
